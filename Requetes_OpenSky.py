@@ -28,13 +28,12 @@ class OpenSky:
         if not bbox:
             bbox = {}
 
-        token = self.get_token
+        token = self.get_token()
         #On inclue notre token dans le header de la requête
         headers = {"Authorization": f"Bearer {token}"}
 
         #La requête inclue la zone de recherche et le token
         r = requests.get(self.url_json, headers=headers,
                          params=bbox, timeout=15)
-
         return r.json()
 
