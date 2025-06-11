@@ -3,9 +3,15 @@ from Requetes_OpenSky import *
 
 class Main:
     """Classe Principale"""
-    def __init__(self):
+    def __init__(self, bbox = None):
         """On initialise et on lance un timer à l'appel de la classe"""
         self.timer = None
+
+        if not bbox:
+            self.bbox = {}
+        else:
+            self.bbox = bbox
+
         self.start_timer()
 
     def start_timer(self):
@@ -14,26 +20,11 @@ class Main:
         #Le timer est relancé
         self.timer.start()
 
-    def recup_donnees(self, data_count, num_avions):
-        """Fonction qui appelle un objet OpenSky() contenant le state array brut
-        Ajoute une fonctionallite qui retourne un nombre d'appels au API egal a data_count
-        Ajoute une fonctionallite qui filtre le nombre de lignes egal a num_avions
-        """
-
-        """ -------------------------- a completer ----------------------------
-        if data_count == 0:
-            # retoune nombre infini/live
-
-        else:
-            # retourne data_count nombre d'appels au API
-        ------------------------------------------------------------------------
-        """
-
-
-        state = OpenSky().get_json()["states"]
+    def recup_donnees(self):
+        """Fonction qui appelle un objet OpenSky() contenant le state array brut"""
+        state = OpenSky().get_json(self.bbox)["states"]
         self.start_timer()  #On relance le timer dès que la requête est parvenue
-        print(state[0])
-        return state[0]
+        print(state)
+        return state
 
-main = Main()
-main.recup_donnees()
+main = Main({"lamin" : 45.83, "lomin" : 5.99, "lamax" : 47.82, "lomax" : 10.52})
