@@ -14,11 +14,26 @@ class Main:
         #Le timer est relancé
         self.timer.start()
 
-    def recup_donnees(self):
-        """Fonction qui appelle un objet OpenSky() contenant le state array brut"""
+    def recup_donnees(self, data_count, num_avions):
+        """Fonction qui appelle un objet OpenSky() contenant le state array brut
+        Ajoute une fonctionallite qui retourne un nombre d'appels au API egal a data_count
+        Ajoute une fonctionallite qui filtre le nombre de lignes egal a num_avions
+        """
+
+        """ -------------------------- a completer ----------------------------
+        if data_count == 0:
+            # retoune nombre infini/live
+
+        else:
+            # retourne data_count nombre d'appels au API
+        ------------------------------------------------------------------------
+        """
+
+
         state = OpenSky().get_json()["states"]
         self.start_timer()  #On relance le timer dès que la requête est parvenue
-        return state
+        print(state[0])
+        return state[0]
 
 main = Main()
-print(main.recup_donnees())
+main.recup_donnees()
