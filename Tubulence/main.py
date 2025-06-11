@@ -1,7 +1,5 @@
 import threading
 
-from Tools.scripts.parse_html5_entities import get_json
-
 from Requetes_OpenSky import *
 
 class Main:
