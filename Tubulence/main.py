@@ -10,7 +10,7 @@ class Main:
 
     def start_timer(self):
         """Fonction timer qui appelle recup_donnees 6s après son appel"""
-        self.timer = threading.Timer(6, self.recup_donnees)
+        self.timer = threading.Timer(5, self.recup_donnees)
         #Le timer est relancé
         self.timer.start()
 
@@ -18,6 +18,8 @@ class Main:
         """Fonction qui appelle un objet OpenSky() contenant le state array brut"""
         state = OpenSky().get_json()["states"]
         self.start_timer()  #On relance le timer dès que la requête est parvenue
-
+        return state
 if __name__ == "__main__":
     main = Main()
+    print(main.recup_donnees())
+
