@@ -3,7 +3,9 @@ import numpy as np
 
 class OpenMeteo:
 
+    #base de l'url de l'api d'open-meteo
     url = "https://api.open-meteo.com/v1/forecast"
+    #Liste des niveaus de pression disponibles sur l'api
     niveaux_possibles = np.array(
         [1000, 975, 950, 925, 900, 850, 800, 700, 600,
          500, 400, 300, 250,200, 150, 100, 70, 50, 30])
@@ -55,31 +57,56 @@ class OpenMeteo:
         Entrée
         ------
         turb_array : ndarray (N, 3)
-            Colonne 0 → latitude
-            Colonne 1 → longitude
-            Colonne 2 → niveau-pression en hPa
+            Colonne 0 -> latitude
+            Colonne 1 -> longitude
+            Colonne 2 -> niveau-pression en hPa
 
         Sortie
         ------
         ndarray (N, 2)
-            Colonne 0 → vitesse du vent (m/s)
-            Colonne 1 → direction du vent (°)
+            Colonne 0 -> vitesse du vent (m/s)
+            Colonne 1 -> direction du vent (°)
+            Colonne 2 ->
         """
-        n = array_hpa.shape[0]
-        result = np.empty((n, 2), dtype=float)
+        # Création d'un array pour stocker les résultats
+        n = len(array_hpa)
+        result = np.empty((n, 4), dtype=float)
 
-        for i, (lat, lon, niv) in enumerate(array_hpa):
-            niveau = self.niveau_proche(niv)
-            suffixe = f"{int(niveau)}hPa"
+        # Itèration sur chaque turbulence active
+        for turb, (lat, lon, niv) in enumerate(array_hpa):
+
+            # Normalisation du niveau souhaité au plus proche disponible
+            niveau = int(self.niveau_proche(niv))
+
+            # Récupération des niveaux supérieurs et inférieurs
+            indice_niveau = np.where(self.niveaux_possibles == niveau)[0][0]
+            niveau_plus = int(self.niveaux_possibles[indice_niveau+1])
+            niveau_moins = int(self.niveaux_possibles[indice_niveau-1])
+
+            niveaux_a_demander = (
+                f"wind_speed_{niveau_moins}hPa",
+                f"wind_speed_{niveau}hPa",
+                f"wind_speed_{niveau_plus}hPa,"
+                f"wind_direction_{niveau}hPa")
+
             params = {
                 "latitude": lat,
                 "longitude": lon,
-                "hourly": f"wind_speed_{suffixe},wind_direction_{suffixe}",
+                "hourly": ",".join(niveaux_a_demander),
                 "timezone": "UTC",
             }
+            #On récupère le résultat de la requête à l'api
             hourly = requests.get(self.url, params=params, timeout=10).json()["hourly"]
-            result[i, 0] = hourly[f"wind_speed_{suffixe}"][0]  # vitesse
-            result[i, 1] = hourly[f"wind_direction_{suffixe}"][0]  # direction
+
+            #Vitesse et direction du vent
+            result[turb, 0] = hourly[f"wind_speed_{niveau}hPa"][0]  # vitesse
+            result[turb, 1] = hourly[f"wind_direction_{niveau}hPa"][0]  # direction
+
+            #Cisaillement verticaux
+            result[turb, 2] = (hourly[f"wind_speed_{niveau_plus}hPa"][0]
+                            - hourly[f"wind_speed_{niveau}hPa"][0])
+            result[turb, 3] = (hourly[f"wind_speed_{niveau}hPa"][0]
+                            - hourly[f"wind_speed_{niveau_moins}hPa"][0])
 
         return result
 
