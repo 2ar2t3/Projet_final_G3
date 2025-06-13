@@ -39,21 +39,20 @@ class Turbulence():
         Implémentation factice ici.
         """
 
-        # Group by 'nom' to get altitude stats per plane
+        # Group by 'nom' pour avoir les altitudes pour chaque avion
         alt_stats = states.groupby('nom')['altitude'].agg(['mean', 'std']).rename(
             columns={'mean': 'alt_mean', 'std': 'alt_std'})
 
-        # Join stats back to the full dataframe
+        # Rejoin les statistiques dans le DF
         states = states.reset_index().merge(alt_stats, on='nom')
 
-        # Identify rows where altitude is outside ±1 std deviation
+        # Identifie les rangees ou l'altitude est en dehors ±1 ecart type
         outliers = states[
             (states['altitude'] > states['alt_mean'] + states['alt_std']) |
             (states['altitude'] < states['alt_mean'] - states['alt_std'])
             ]
 
-        # Extract corresponding longitude and latitude as NumPy array
-
+        # Extrait la longitude et latitude en NumPy array
         resultat = outliers[['longitude', 'latitude']].to_numpy()
         print(resultat[0])
         return resultat
