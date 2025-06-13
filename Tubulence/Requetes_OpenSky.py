@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 
+
 class OpenSky:
 
     #Définition de variable de classes
