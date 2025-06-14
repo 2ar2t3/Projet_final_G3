@@ -1,16 +1,15 @@
 import threading
 
 from Requetes_OpenSky import *
+from turbulence import *
 
 class Main:
     """Classe Principale"""
     def __init__(self, bbox = None):
         """On initialise et on lance un timer à l'appel de la classe"""
         self.timer = None
-        if not bbox:
-            self.bbox = {}
-        else:
-            self.bbox = bbox
+        self.bbox = bbox if bbox else {}
+        self.turbulence_detector = Turbulence()  # ← Keep a persistent instance
         self.start_timer()
 
     def start_timer(self):
@@ -24,6 +23,11 @@ class Main:
 
         #States est un dataframe
         states = OpenSky().get_json(self.bbox)
+        turbulences = self.turbulence_detector.get_turbulences(states)
+
+
         self.start_timer()  #On relance le timer dès que la requête est parvenue
+
+
 
 main = Main()
