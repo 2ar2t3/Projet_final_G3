@@ -1,4 +1,5 @@
 import threading
+import datetime
 
 from Requetes_OpenSky import *
 from turbulence import *
@@ -23,6 +24,12 @@ class Main:
 
         #States est un dataframe
         states = OpenSky().get_json(self.bbox)
+
+        # /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        print(f"\nNombre d'avions en vol suivis : {len(states)}")
+        # Ajoute un print de l'heure actuelle /////////////////////////////////////////////////////////////////////////
+        print(f"L'heure actuelle : {datetime.datetime.now()}")
+
         turbulences = self.turbulence_detector.get_turbulences(states)
 
 

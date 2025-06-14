@@ -1,0 +1,36 @@
+Nombre d'avions en vol suivis : 6812
+L'heure actuelle : 2025-06-13 22:20:12.233580
+Nombre d'avions en vol suivis : 6812
+L'heure actuelle : 2025-06-13 22:20:19.547568
+Nombre d'avions en vol suivis : 6805
+L'heure actuelle : 2025-06-13 22:20:26.909555
+Nombre d'avions en vol suivis : 6795
+L'heure actuelle : 2025-06-13 22:20:34.193341
+Nombre d'avions en vol suivis : 6793
+L'heure actuelle : 2025-06-13 22:20:41.531782
+Nombre d'avions en vol suivis : 6790
+L'heure actuelle : 2025-06-13 22:20:48.783533
+Number of unique planes: 6837
+Nombre d'avions dans alt_stats = 6837
+[[-112.3717   40.6057 1661.16  ]
+ [ -81.2228   29.3946  441.96  ]
+ [ -88.5807   43.9917  251.46  ]]
+length of turbulences: 421
+
+Nombre d'avions en vol suivis : 6789
+L'heure actuelle : 2025-06-13 22:20:56.138266
+Number of unique planes: 6824
+Nombre d'avions dans alt_stats = 6824
+[[-112.3717   40.6057 1661.16  ]
+ [ -81.2221   29.4032  441.96  ]
+ [ -88.5807   43.9917  251.46  ]]
+length of turbulences: 444
+
+Nombre d'avions en vol suivis : 6787
+L'heure actuelle : 2025-06-13 22:21:03.469607
+Number of unique planes: 6821
+Nombre d'avions dans alt_stats = 6821
+[[ -81.2185   29.4083  441.96  ]
+ [ -88.5807   43.9917  251.46  ]
+ [ -62.025    46.0001 8023.86  ]]
+length of turbulences: 470
