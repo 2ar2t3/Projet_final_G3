@@ -54,7 +54,9 @@ class Turbulence():
 
         # Extrait la longitude et latitude en NumPy array
         resultat = outliers[['longitude', 'latitude']].to_numpy()
-        print(resultat[0])
+        # Utilise pour tester quelles longitudes et lattitudes sont retournees ////////////////////////////////////////
+        # print(resultat[0])
+
         return resultat
 
 
