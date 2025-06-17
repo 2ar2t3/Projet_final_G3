@@ -74,14 +74,19 @@ class TurbulenceDetector:
                     # Avion en turbulence qui devient stable
                     self.turbulence_en_cours[plane_name]['stable_count'] += 1
 
+                    if self.turbulence_en_cours[plane_name]['stable_count'] == 1:
+                        lat_end, lon_end, alt_end, _ = hist_deque[-2]
+                        self.turbulence_en_cours[plane_name]['candidate_end'] = (
+                            lat_end, lon_end, alt_end)
+
                     if self.turbulence_en_cours[plane_name]['stable_count'] == 2:
                         # Deux ticks stables consécutifs -> fin de la turbulence
-                        # Récupérer la position actuelle comme fin de turbulence
-                        lat_end, lon_end, alt_end, _ = hist_deque[-1]
-                        self.turbulence_en_cours[plane_name]['end'] = (lat_end, lon_end, alt_end)
                         # Calculer le "diamètre" basé sur la distance entre début et fin
+
                         start_coords = self.turbulence_en_cours[plane_name]['start']
-                        end_coords = self.turbulence_en_cours[plane_name]['end']
+                        end_coords = self.turbulence_en_cours[plane_name].get(
+                            'candidate_end')
+
                         distance_km = self.distance_horizontale_km(start_coords, end_coords)
                         # Préparer l'événement de turbulence terminé
                         event = {
@@ -126,6 +131,7 @@ class TurbulenceDetector:
         for plane_name, deque_avion in self.history.items():
             print(f"{plane_name} ➜ {deque_avion}")
         print(self.turbulence_en_cours)
+
         return turbulences_terminees
 
     def instabilite_detectee(self, vertical_rates):
