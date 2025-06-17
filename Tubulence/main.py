@@ -28,10 +28,10 @@ class Main:
         #Events est un dataframe contenant les informations relatives aux turbulences
         turbulences = self.detector.update(states)
 
-        if turbulences.size:  # seulement si le tableau n'est pas vide
-             # Météo est un numpy array contenant la vitesse, direction et cisaillement
-             # du vent aux coordonées des turbulences
-             meteo = OpenMeteo(turbulences).resultats
+        # if turbulences.size:  # seulement si le tableau n'est pas vide
+        #      # Météo est un numpy array contenant la vitesse, direction et cisaillement
+        #      # du vent aux coordonées des turbulences
+        #      meteo = OpenMeteo(turbulences).resultats
 
         self.start_timer()  #On relance le timer dès que la requête est parvenue
 
