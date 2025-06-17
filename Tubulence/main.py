@@ -12,6 +12,7 @@ class Main:
         self.bbox = bbox if bbox else {}
         self.start_timer()
         self.detector = TurbulenceDetector(window_size=5)
+        self.turbulences_actives = np.empty((0, 3), dtype=float)
 
     def start_timer(self):
         """Fonction timer qui appelle recup_donnees 6s après son appel"""
@@ -25,13 +26,18 @@ class Main:
         #States est un dataframe contenant les informations relatives aux avions
         states = OpenSky().get_json(self.bbox)
 
-        #Events est un dataframe contenant les informations relatives aux turbulences
-        turbulences = self.detector.update(states)
+        turbulences_recentes = self.detector.update(states)
 
-        # if turbulences.size:  # seulement si le tableau n'est pas vide
-        #      # Météo est un numpy array contenant la vitesse, direction et cisaillement
-        #      # du vent aux coordonées des turbulences
-        #      meteo = OpenMeteo(turbulences).resultats
+        if turbulences_recentes.size:  # seulement si le tableau n'est pas vide
+            if self.turbulences_actives.size:  # déjà des actives ?
+                self.turbulences_actives = np.vstack(
+                    (self.turbulences_actives, turbulences_recentes)
+                )
+            else:  # aucune active encore
+                self.turbulences_actives = turbulences_recentes.copy()
+
+        if self.turbulences_actives.size:
+            meteo = OpenMeteo(self.turbulences_actives).resultats
 
         self.start_timer()  #On relance le timer dès que la requête est parvenue
 
