@@ -14,7 +14,7 @@ class Data:
         self.turbulences = tableau_turbulences
 
     def generer_dataframe(self):
-        df = pd.DataFrame(self.turbulences, columns=['latitude', 'longitude', 'altitude'])
+        df = pd.DataFrame(self.turbulences, columns=['longitude', 'latitude', 'altitude'])
         df['Turbulences'] = [f'Zone {i + 1}' for i in range(len(df))]
         df['diametre'] = 50000
         return df

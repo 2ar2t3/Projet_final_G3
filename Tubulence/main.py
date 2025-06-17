@@ -1,4 +1,5 @@
 import threading
+
 from Requetes_OpenSky import *
 from turbulence import *
 
@@ -8,6 +9,7 @@ class Main:
         """On initialise et on lance un timer à l'appel de la classe"""
         self.timer = None
         self.bbox = bbox if bbox else {}
+        self.turbulence_detector = Turbulence()  # ← Keep a persistent instance
         self.start_timer()
         self.detector = TurbulenceDetector(window_size=5)
 
