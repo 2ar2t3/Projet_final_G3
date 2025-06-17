@@ -47,7 +47,7 @@ class OpenSky:
             #On n'ajoute que les colonnes souhaitées
             lignes.append([avion[0], avion[5], avion[6], altitude, avion[11]])
 
-        return pd.DataFrame(lignes, columns=colonnes)
+        return pd.DataFrame(lignes, columns=colonnes).dropna(how='any')
 
     def get_json(self, bbox = None):
         """Fonction qui retourne le state array complet sous format json"""
