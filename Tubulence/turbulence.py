@@ -137,7 +137,7 @@ class TurbulenceDetector:
         # Exemple de critère simplifié: instabilité si la variation absolue max du vertical_rate dépasse un seuil.
         variations = [abs(vertical_rates[i] - vertical_rates[i-1]) for i in range(1, len(vertical_rates))]
         # Seuil arbitraire: par exemple 500 (ft/min) - à ajuster selon les données réelles
-        return max(variations) > 500
+        return max(variations) > 25
 
     def distance_horizontale_km(self, coord1, coord2):
         """
