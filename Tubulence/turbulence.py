@@ -45,6 +45,7 @@ class TurbulenceDetector:
         # Identifier les avions qui ont disparu (présents auparavant mais pas dans le states_df actuel)
         existing_planes = set(self.history.keys()) #avions des 5 ticks précédents
         current_planes = set(states_df.index) #avions du tick récent
+        # print(f"Nombre d'avions en vol: {len(current_planes)}") # ///////////////////////////////////////////////////////////////////
         disappeared = existing_planes - current_planes
 
         for plane_name in disappeared:
@@ -126,7 +127,7 @@ class TurbulenceDetector:
                     self.instabilite_provisoire.pop(plane_name, None)
                 # (Si l'avion n'était ni instable provisoire ni en turbulence, ne rien faire)
 
-        print(f"Nombre d'avions en turbulence: {len(self.turbulence_en_cours)}")
+        print(f"Nombre d'avions en turbulence: {len(self.turbulence_en_cours)}")# //////////////////////////////////////////////////////
         return self.centre_turbulence(turbulences_terminees)
 
     def instabilite_detectee(self, vr_list):
@@ -156,7 +157,7 @@ class TurbulenceDetector:
         # Calcul de l'amplitude totale de variation sur la fenêtre (somme des variations absolues)
         total_movement = sum(abs(d) for d in diffs)
         # Définition des critères de turbulence basés sur les seuils heuristiques
-        # Critère 1 : saut instantané grand (différence >= 4 m/s en 6s)
+        # Critère 1 : saut instantané grand
         large_jump = any(abs(d) >= 10 for d in diffs)
         # Critère 2 : au moins 2 inversions de direction (oscillation marquée) avec mouvement total > 2 m / s
         multi_flip = (sign_changes >= 2 and total_movement > 12)
