@@ -2,6 +2,7 @@ import threading
 
 from Requetes_OpenSky import *
 from turbulence import *
+from requetes_meteo import *
 
 class Main:
     """Classe Principale"""
@@ -23,11 +24,15 @@ class Main:
 
         #States est un dataframe contenant les informations relatives aux avions
         states = OpenSky().get_json(self.bbox)
+
         #Events est un dataframe contenant les informations relatives aux turbulences
-        events = self.detector.update(states)
+        turbulences = self.detector.update(states)
+
+        if turbulences.size:  # seulement si le tableau n'est pas vide
+             # Météo est un numpy array contenant la vitesse, direction et cisaillement
+             # du vent aux coordonées des turbulences
+             meteo = OpenMeteo(turbulences).resultats
 
         self.start_timer()  #On relance le timer dès que la requête est parvenue
-
-
 
 main = Main()

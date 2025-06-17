@@ -41,7 +41,7 @@ class OpenMeteo:
             Copie du tableau, mais la colonne 2 contient la pression en hPa.
         """
         out = arr_ft.copy()  # ne modifie pas l’original
-        z_m = out[:, 2] * 0.3048  # pieds → mètres
+        z_m = out[:, 2] # mètres
         p0, L, T0, gM_RL = 1013.25, 0.0065, 288.15, 5.255877
         out[:, 2] = p0 * (1 - L * z_m / T0) ** gM_RL
         return out
@@ -103,19 +103,9 @@ class OpenMeteo:
             result[turb, 1] = hourly[f"wind_direction_{niveau}hPa"][0]  # direction
 
             #Cisaillement verticaux
-            result[turb, 2] = (hourly[f"wind_speed_{niveau_plus}hPa"][0]
-                            - hourly[f"wind_speed_{niveau}hPa"][0])
-            result[turb, 3] = (hourly[f"wind_speed_{niveau}hPa"][0]
-                            - hourly[f"wind_speed_{niveau_moins}hPa"][0])
+            result[turb, 2] = (hourly[f"wind_speed_{niveau_plus}hPa"][0] -
+                               result[turb, 0])
+            result[turb, 3] = (result[turb, 0] -
+                               hourly[f"wind_speed_{niveau_moins}hPa"][0])
 
         return result
-
-
-points_ft = np.array([
-    [46.50, 7.00, 35000],
-    [47.10, 8.25, 30000],
-    [45.80, 6.80, 26000],
-], dtype=float)
-
-test = OpenMeteo(points_ft).resultats
-print(test)

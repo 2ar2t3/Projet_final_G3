@@ -90,7 +90,6 @@ class TurbulenceDetector:
                         distance_km = self.distance_horizontale_km(start_coords, end_coords)
                         # Préparer l'événement de turbulence terminé
                         event = {
-                            "plane": plane_name,
                             "start": {"lat": start_coords[0], "lon": start_coords[1], "alt": start_coords[2]},
                             "end": {"lat": end_coords[0], "lon": end_coords[1], "alt": end_coords[2]},
                             "distance_km": round(distance_km, 3)
@@ -127,12 +126,7 @@ class TurbulenceDetector:
                     self.instabilite_provisoire.pop(plane_name, None)
                 # (Si l'avion n'était ni instable provisoire ni en turbulence, ne rien faire)
 
-        print('taille = ', len(self.history))
-        for plane_name, deque_avion in self.history.items():
-            print(f"{plane_name} ➜ {deque_avion}")
-        print(self.turbulence_en_cours)
-
-        return turbulences_terminees
+        return self.centre_turbulence(turbulences_terminees)
 
     def instabilite_detectee(self, vertical_rates):
         """(a, c, c, d, g)
@@ -163,3 +157,28 @@ class TurbulenceDetector:
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         distance = R * c
         return distance
+
+    def centre_turbulence(self, turb):
+        """
+        Calcule le centre (lat, lon, alt) de chaque turbulence supposée sphérique
+        et renvoie un ndarray (N, 3).
+
+        Paramètre
+        ---------
+        turb : list[dict]
+        liste de dicts au format actuellement renvoyé par update()
+
+        Retour
+        ------
+        ndarray (N, 3)
+            Colonnes : lat_c, lon_c, alt_c
+        """
+        centres = []
+        for evt in turb:  # evt est un dict 'start' / 'end'
+            lat_c = (evt['start']['lat'] + evt['end']['lat']) / 2.0
+            lon_c = (evt['start']['lon'] + evt['end']['lon']) / 2.0
+            alt_c = (evt['start']['alt'] + evt['end']['alt']) / 2.0
+            diam = evt['distance_km']
+            centres.append((lat_c, lon_c, alt_c, diam))
+
+        return np.asarray(centres, dtype=float)
