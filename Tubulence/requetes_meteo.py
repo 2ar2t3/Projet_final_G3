@@ -56,24 +56,26 @@ class OpenMeteo:
         """
         Entrée
         ------
-        turb_array : ndarray (N, 3)
+        turb_array : ndarray (N, 4)
             Colonne 0 -> latitude
             Colonne 1 -> longitude
             Colonne 2 -> niveau-pression en hPa
+            Colonne 3 -> diametre de la turbulence
 
         Sortie
         ------
-        ndarray (N, 2)
+        ndarray (N, 4)
             Colonne 0 -> vitesse du vent (m/s)
             Colonne 1 -> direction du vent (°)
-            Colonne 2 ->
+            Colonne 2 -> cisaillement au dessus
+            Colonne 3 -> cisaillement en dessous
         """
         # Création d'un array pour stocker les résultats
         n = len(array_hpa)
         result = np.empty((n, 4), dtype=float)
 
         # Itèration sur chaque turbulence active
-        for turb, (lat, lon, niv) in enumerate(array_hpa):
+        for turb, (lat, lon, niv, _) in enumerate(array_hpa):
 
             # Normalisation du niveau souhaité au plus proche disponible
             niveau = int(self.niveau_proche(niv))
