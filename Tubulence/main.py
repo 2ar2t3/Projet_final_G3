@@ -1,44 +1,79 @@
-import threading
+import threading, time, numpy as np
 
-from Requetes_OpenSky import *
-from turbulence import *
-from requetes_meteo import *
+from Requetes_OpenSky import OpenSky
+from turbulence       import TurbulenceDetector
+from requetes_meteo   import OpenMeteo
+# from mon_module_ui   import affichage
+from modele_deplacement_turbulence import deplacement_turbulence
+
+# streamlit run affichage_streamlit.py
 
 class Main:
-    """Classe Principale"""
-    def __init__(self, bbox = None):
-        """On initialise et on lance un timer à l'appel de la classe"""
-        self.timer = None
-        self.bbox = bbox if bbox else {}
-        self.start_timer()
+    """Collecte ADS-B, cumule les turbulences, déclenche l’affichage."""
+    def __init__(self, bbox=None):
+        self.bbox = bbox
         self.detector = TurbulenceDetector(window_size=5)
-        self.turbulences_actives = np.empty((0, 3), dtype=float)
 
-    def start_timer(self):
-        """Fonction timer qui appelle recup_donnees 6s après son appel"""
-        self.timer = threading.Timer(6, self.recup_donnees)
-        #Le timer est relancé
-        self.timer.start()
+        # lon, lat, alt, diametre  (historique complet)
+        self.turbulences_actives = np.empty((0, 4), float)
+        self.to_display = np.empty((0, 4), float)
 
-    def recup_donnees(self):
-        """Fonction qui appelle un objet OpenSky() contenant le state array brut"""
+        self.lock = threading.Lock()
 
-        #States est un dataframe contenant les informations relatives aux avions
-        states = OpenSky().get_json(self.bbox)
+        threading.Thread(target=self.loop, daemon=True).start()
 
-        turbulences_recentes = self.detector.update(states)
+    def loop(self):
+        """Tourne en tâche de fond : collecte + affichage + pause 3 s."""
+        while True:
+            states = OpenSky().get_json(self.bbox)
+            turbulences_recentes = self.detector.update(states)
 
-        if turbulences_recentes.size:  # seulement si le tableau n'est pas vide
-            if self.turbulences_actives.size:  # déjà des actives ?
-                self.turbulences_actives = np.vstack(
-                    (self.turbulences_actives, turbulences_recentes)
-                )
-            else:  # aucune active encore
-                self.turbulences_actives = turbulences_recentes.copy()
+            print(turbulences_recentes)
+            print(self.turbulences_actives)
 
-        if self.turbulences_actives.size:
-            meteo = OpenMeteo(self.turbulences_actives).resultats
+            if turbulences_recentes.size:
+                if self.turbulences_actives.size:
+                    meteo_old = OpenMeteo(self.turbulences_actives).resultats
 
-        self.start_timer()  #On relance le timer dès que la requête est parvenue
+                    #On déplace les anciennes turbulences
+                    turbulences_deplacees = deplacement_turbulence(self.turbulences_actives, meteo_old)
 
-main = Main()
+                    #On ajoute toutes les turbulences ensembles
+                    self.turbulences_actives = np.vstack(
+                        (turbulences_deplacees, turbulences_recentes))
+
+                    "affichage toutes avec météo pour anciennes"
+                    with self.lock:
+                        self.to_display = self.turbulences_actives.copy()
+
+                else:
+                    self.turbulences_actives = turbulences_recentes.copy()
+                    "affichage recentes sans météo"
+                    with self.lock:
+                        self.to_display = self.turbulences_actives.copy()
+
+            if self.turbulences_actives.size and not turbulences_recentes.size:
+                meteo_old = OpenMeteo(self.turbulences_actives).resultats
+                #On déplace les anciennes
+                turbulences_deplacees = deplacement_turbulence(self.turbulences_actives, meteo_old)
+
+                with self.lock:
+                    self.to_display = turbulences_deplacees.copy()
+                "affichage anciennes avec météo pour anciennes"
+
+            print("avant refresh1")
+            time.sleep(3)
+            print("apres refresh1")
+
+
+            meteo_new = OpenMeteo(self.turbulences_actives).resultats
+            turbulences_deplacees = deplacement_turbulence(self.turbulences_actives, meteo_new)
+
+            "affichage toutes avec météo pour toutes"
+            with self.lock:
+                self.to_display = turbulences_deplacees.copy()
+
+            print("avant refresh2")
+            time.sleep(3)
+            print("apres refresh2")
+

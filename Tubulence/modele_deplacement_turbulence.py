@@ -1,55 +1,48 @@
 import numpy as np
 
-class TurbulenceSimulator:
-    def __init__(self, positions_init):
-        """
-        :param positions_init: numpy array shape (n, 3) avec colonnes [lon, lat, alt]
-                               représente la position initiale (ou positions déjà connues)
-        """
-        self.positions = positions_init.tolist()  # liste modifiable
 
-    def calculer_vitesse_effective(self, vitesse_vent, direction_vent, cisaillement_haut, cisaillement_bas):
-        angle_rad = np.deg2rad(direction_vent)
-        vx = vitesse_vent * np.sin(angle_rad)
-        vy = vitesse_vent * np.cos(angle_rad)
-        correction_h = 0.1 * (cisaillement_haut - cisaillement_bas)
-        return np.array([vx, vy, correction_h])
+def deplacement_turbulence(turbulence_data, meteo_data, delta_t=60):
+    """
+    Simule le déplacement de turbulences sur une période delta_t (en secondes).
 
-    def mise_a_jour_position(self, v_eff, dt=6.0):
-        lon, lat, alt = self.positions[-1]  # dernière position
-        dx = v_eff[0] * dt
-        dy = v_eff[1] * dt
-        dz = v_eff[2] * dt
+    Paramètres :
+    - turbulence_data : np.ndarray (n, 4) -> [latitude, longitude, altitude, diamètre]
+    - meteo_data : np.ndarray (n, 4) -> [vitesse_vent (m/s), direction_vent (°), cisaillement_haut, cisaillement_bas]
+    - delta_t : temps écoulé en secondes (par défaut 60s)
 
-        delta_lat = dy / 111000
-        delta_lon = dx / (111000 * np.cos(np.radians(lat)))
+    Retourne :
+    - np.ndarray (n, 4) avec les nouvelles positions
+    """
+    # Constantes pour conversion approximative
+    METERS_PER_DEG_LAT = 111_000
+    METERS_PER_DEG_LON = 85_000  # à adapter selon latitude pour plus de précision
 
-        nouvelle_pos = [lon + delta_lon, lat + delta_lat, alt + dz]
-        self.positions.append(nouvelle_pos)
+    new_data = []
 
-    def simuler(self, donnees_meteo, dt=6.0):
-        """
-        :param donnees_meteo: numpy array shape (m,4) colonnes [vitesse_vent, direction_vent, cisaillement_haut, cisaillement_bas]
-        :param dt: durée d’un pas de temps (s)
-        :return: numpy array shape (n+m, 3) positions actualisées
-        """
-        for ligne in donnees_meteo:
-            v_vent, dir_vent, cis_haut, cis_bas = ligne
-            v_eff = self.calculer_vitesse_effective(v_vent, dir_vent, cis_haut, cis_bas)
-            self.mise_a_jour_position(v_eff, dt)
+    for i in range(turbulence_data.shape[0]):
+        lat, lon, alt, diam = turbulence_data[i]
+        vitesse, direction_deg, cis_haut, cis_bas = meteo_data[i]
 
-        return np.array(self.positions)
+        # Déplacement horizontal causé par le vent
+        direction_rad = np.deg2rad(direction_deg)
+        dx = vitesse * delta_t * np.cos(direction_rad)  # en mètres
+        dy = vitesse * delta_t * np.sin(direction_rad)
 
-# test
-positions_init = np.array([[2.0, 48.0, 100.0]])  # position de départ
+        # Conversion en degrés
+        dlon = dx / METERS_PER_DEG_LON
+        dlat = dy / METERS_PER_DEG_LAT
 
-donnees_meteo = np.array([
-    [10, 270, 3, 1],
-    [12, 280, 2, 1.5],
-    [8,  260, 3.5, 2],
-])
+        # Modification de l'altitude basée sur le cisaillement (simplifiée)
+        delta_alt = (cis_haut - cis_bas) * 0.1  # facteur arbitraire à calibrer
 
-sim = TurbulenceSimulator(positions_init)
-positions_finales = sim.simuler(donnees_meteo, dt=1.0)
+        # Expansion ou contraction du diamètre
+        delta_diam = (abs(cis_haut) + abs(cis_bas)) * 0.01  # facteur arbitraire
 
-print(positions_finales)
+        new_data.append([
+            lat + dlat,
+            lon + dlon,
+            alt + delta_alt,
+            max(diam + delta_diam, 0)  # éviter diamètre négatif
+        ])
+
+    return np.array(new_data)

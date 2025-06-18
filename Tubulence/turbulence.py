@@ -186,7 +186,7 @@ class TurbulenceDetector:
         # Formule de haversine
         a = math.sin(delta_phi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda/2)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-        distance = R * c
+        distance = R * c * 100000
         return distance
 
     def centre_turbulence(self, turb):

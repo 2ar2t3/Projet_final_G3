@@ -2,96 +2,64 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import pydeck as pdk
-import math
-import time
-
-
-st.set_page_config(layout="wide")
-
-# streamlit run C:\Users\laloi\PycharmProjects\Projet_final_G3\Tubulence\affiche_carte.py
+from modele_deplacement_turbulence import *
 
 class Data:
-    def __init__(self, tableau_turbulences):
+    def __init__(self, tableau_turbulences, label="originale"):
         self.turbulences = tableau_turbulences
+        self.label = label
 
     def generer_dataframe(self):
-        df = pd.DataFrame(self.turbulences, columns=['longitude', 'latitude', 'altitude', 'diametre'])
-        df['Turbulences'] = [f'Zone {i + 1}' for i in range(len(df))]
+        df = pd.DataFrame(self.turbulences, columns=['latitude', 'longitude', 'altitude', 'diametre'])
+        df['Turbulences'] = [f'Zone {i + 1} ({self.label})' for i in range(len(df))]
+        df['source'] = self.label
         return df
 
-        # Fonction pour générer un polygone circulaire autour d'un point lat/lon
-    def generer_polygone_cercle(self, lat, lon, rayon_m, nb_points=30):
-        """
-        Génère une liste de points (lat, lon) formant un cercle autour du centre
-        rayon_m: rayon en mètres
-        """
-        coords = []
-        # Rayon de la terre approx
-        R = 6371000
-        for i in range(nb_points):
-            angle = 2 * math.pi * i / nb_points
-            dlat = (rayon_m / R) * math.cos(angle)
-            dlon = (rayon_m / (R * math.cos(math.pi * lat / 180))) * math.sin(angle)
-            point_lat = lat + dlat * 180 / math.pi
-            point_lon = lon + dlon * 180 / math.pi
-            coords.append([point_lon, point_lat])
-        coords.append(coords[0])  # Fermer le polygone
-        return coords
-
 class Carte:
-    def __init__(self, Data):
-        self.Data = Data
+    def __init__(self, *data_objects):
+        self.data_objects = data_objects
 
     def affichage(self):
-        st.title("🌍 Zones de turbulences volumétriques selon altitude")
+        # Fusion de tous les DataFrames
+        dfs = [data_obj.generer_dataframe() for data_obj in self.data_objects]
+        df_all = pd.concat(dfs)
 
-        carte_container = st.empty()
+        # Création d'un Scatterplot par type
+        colors = {
+            'originale': [255, 0, 0, 160],   # Rouge
+            'predite': [0, 0, 255, 160]      # Bleu
+        }
 
-        df = self.Data.generer_dataframe()
-
-
-        polygones = []
-        for _, row in df.iterrows():
-            poly = {
-                "polygon": self.Data.generer_polygone_cercle(row.latitude, row.longitude, row.diametre / 2),
-                "elevation": row.altitude,
-                "couleur": [255, 0, 0, 100]
-            }
-            polygones.append(poly)
-
-        layer = pdk.Layer(
-            "PolygonLayer",
-            data=polygones,
-            get_polygon="polygon",
-            get_fill_color="couleur",
-            get_elevation="elevation",
-            elevation_scale=1,
-            extruded=True,
-            stroked=True,
-            filled=True,
-            wireframe=True,
-            pickable=True
-        )
+        layers = []
+        for source in df_all['source'].unique():
+            df_part = df_all[df_all['source'] == source]
+            color = colors.get(source, [0, 255, 0, 160])  # Vert par défaut
+            layer = pdk.Layer(
+                "ScatterplotLayer",
+                data=df_part,
+                get_position='[longitude, latitude]',
+                get_radius='diametre / 2',
+                get_fill_color=color,
+                pickable=True,
+                opacity=0.6,
+                stroked=True,
+                filled=True
+            )
+            layers.append(layer)
 
         view_state = pdk.ViewState(
-            latitude=20,
-            longitude=0,
-            zoom=1.5,
-            pitch=45,
+            latitude=df_all["latitude"].mean(),
+            longitude=df_all["longitude"].mean(),
+            zoom=3,
+            pitch=0,
             bearing=0
         )
 
         deck = pdk.Deck(
-            layers=[layer],
+            layers=layers,
             initial_view_state=view_state,
             map_style="mapbox://styles/mapbox/light-v9",
-            tooltip={"text": "{nom}\nAltitude: {elevation} m"}
+            tooltip={"text": "{Turbulences}\nAltitude: {altitude} m"}
         )
 
-        carte_container.pydeck_chart(deck)
-
-"""
-data = Data()
-carte = Carte(data)
-carte.affichage()
-"""
+        st.pydeck_chart(deck)
