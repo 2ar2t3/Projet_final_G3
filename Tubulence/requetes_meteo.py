@@ -23,7 +23,7 @@ class OpenMeteo:
             self.donnees_vent(self.conversion_altitude_en_hpa(array)))
 
     @staticmethod
-    def  conversion_altitude_en_hpa(arr_ft):
+    def conversion_altitude_en_hpa(arr_ft):
         """
         Copie le tableau `(lat, lon, altitude_ft)` et remplace la 3ᵉ colonne
         par la pression standard (hPa) selon l’atmosphère ISA.

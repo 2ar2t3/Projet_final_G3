@@ -159,9 +159,9 @@ class TurbulenceDetector:
         # Définition des critères de turbulence basés sur les seuils heuristiques
         # Critère 1 : saut instantané grand
         large_jump = any(abs(d) >= 10 for d in diffs)
-        # Critère 2 : au moins 2 inversions de direction (oscillation marquée) avec mouvement total > 2 m / s
+        # Critère 2 : au moins 2 inversions de direction (oscillation marquée) avec mouvement total > 12m
         multi_flip = (sign_changes >= 2 and total_movement > 12)
-        # Critère 3 : 1 inversion de direction (une oscillation) mais avec amplitude totale > 3 m / s
+        # Critère 3 : 1 inversion de direction (une oscillation) mais avec mouvement total > 15m
         one_flip = (sign_changes == 1 and total_movement > 15)
 
         # Décision : turbulence détectée si l'un des critères est rempli
