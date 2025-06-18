@@ -6,7 +6,7 @@ import math
 import time
 
 
-st.set_page_config(layout="wide")
+#st.set_page_config(layout="wide")
 
 # streamlit run C:\Users\laloi\PycharmProjects\Projet_final_G3\Tubulence\affiche_carte.py
 
@@ -15,7 +15,7 @@ class Data:
         self.turbulences = tableau_turbulences
 
     def generer_dataframe(self):
-        df = pd.DataFrame(self.turbulences, columns=['longitude', 'latitude', 'altitude', 'diametre'])
+        df = pd.DataFrame(self.turbulences, columns=['latitude', 'longitude', 'altitude', 'diametre'])
         df['Turbulences'] = [f'Zone {i + 1}' for i in range(len(df))]
         return df
 
@@ -45,17 +45,18 @@ class Carte:
     def affichage(self):
         st.title("🌍 Zones de turbulences volumétriques selon altitude")
 
-        carte_container = st.empty()
+        #carte_container = st.empty()
 
         df = self.Data.generer_dataframe()
-
+        st.write(df)
 
         polygones = []
         for _, row in df.iterrows():
             poly = {
                 "polygon": self.Data.generer_polygone_cercle(row.latitude, row.longitude, row.diametre / 2),
                 "elevation": row.altitude,
-                "couleur": [255, 0, 0, 100]
+                "couleur": [255, 0, 0, 100],
+                "nom": row.Turbulences
             }
             polygones.append(poly)
 
@@ -88,10 +89,15 @@ class Carte:
             tooltip={"text": "{nom}\nAltitude: {elevation} m"}
         )
 
-        carte_container.pydeck_chart(deck)
-
+        #carte_container.pydeck_chart(deck)
+        st.pydeck_chart(deck)
 """
-data = Data()
+turbulences_exemple = [
+    [-149.9909, 61.1436, 628.4, 500000],
+    [-112.7591, 32.0979, 6046.47, 300000]
+
+]
+data = Data(turbulences_exemple)
 carte = Carte(data)
 carte.affichage()
 """
