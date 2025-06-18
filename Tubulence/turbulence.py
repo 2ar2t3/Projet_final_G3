@@ -45,6 +45,7 @@ class TurbulenceDetector:
         # Identifier les avions qui ont disparu (présents auparavant mais pas dans le states_df actuel)
         existing_planes = set(self.history.keys()) #avions des 5 ticks précédents
         current_planes = set(states_df.index) #avions du tick récent
+        # print(f"Nombre d'avions en vol: {len(current_planes)}") # ///////////////////////////////////////////////////////////////////
         disappeared = existing_planes - current_planes
 
         for plane_name in disappeared:
@@ -126,18 +127,48 @@ class TurbulenceDetector:
                     self.instabilite_provisoire.pop(plane_name, None)
                 # (Si l'avion n'était ni instable provisoire ni en turbulence, ne rien faire)
 
+        print(f"Nombre d'avions en turbulence: {len(self.turbulence_en_cours)}")# //////////////////////////////////////////////////////
         return self.centre_turbulence(turbulences_terminees)
 
-    def instabilite_detectee(self, vertical_rates):
-        """(a, c, c, d, g)
-        Analyse une liste des derniers vertical_rate pour déterminer s'il y a instabilité.
-        Retourne True si instabilité détectée, False sinon.
-        (Critère à affiner en fonction des besoins : ici simple écart-type ou variation brusque par exemple)
-        """
-        # Exemple de critère simplifié: instabilité si la variation absolue max du vertical_rate dépasse un seuil.
-        variations = [abs(vertical_rates[i] - vertical_rates[i-1]) for i in range(1, len(vertical_rates))]
-        # Seuil arbitraire: par exemple 500 (ft/min) - à ajuster selon les données réelles
-        return max(variations) > 25
+    def instabilite_detectee(self, vr_list):
+
+        """Détecte une instabilité verticale (turbulence) à partir d'une liste de 5
+        valeurs de vertical_rate (m/s).
+        Retourne True si une turbulence est détectée, False sinon."""
+
+        # Vérifier que 5 valeurs sont fournies
+        if vr_list is None or len(vr_list) < 5:
+            raise ValueError("La liste vr_list doit contenir 5 valeurs de vertical_rate.")
+        # Calcul des variations successives (différences) de vertical_rate entre
+        diffs = [vr_list[i + 1] - vr_list[i] for i in range(len(vr_list) - 1)]
+        # Compter les changements de signe des variations (ignorer les diffs nulles)
+        sign_changes = 0
+        last_sign = 0
+        for d in diffs:
+            if d == 0:
+                continue  # on ignore les variations nulles (pas de changement)
+            sign = 1 if d > 0 else -1
+            if last_sign == 0:
+                last_sign = sign
+            elif sign != last_sign:
+                sign_changes += 1
+                last_sign = sign
+
+        # Calcul de l'amplitude totale de variation sur la fenêtre (somme des variations absolues)
+        total_movement = sum(abs(d) for d in diffs)
+        # Définition des critères de turbulence basés sur les seuils heuristiques
+        # Critère 1 : saut instantané grand
+        large_jump = any(abs(d) >= 10 for d in diffs)
+        # Critère 2 : au moins 2 inversions de direction (oscillation marquée) avec mouvement total > 2 m / s
+        multi_flip = (sign_changes >= 2 and total_movement > 12)
+        # Critère 3 : 1 inversion de direction (une oscillation) mais avec amplitude totale > 3 m / s
+        one_flip = (sign_changes == 1 and total_movement > 15)
+
+        # Décision : turbulence détectée si l'un des critères est rempli
+        if large_jump or multi_flip or one_flip:
+            return True
+        else:
+            return False
 
     def distance_horizontale_km(self, coord1, coord2):
         """
