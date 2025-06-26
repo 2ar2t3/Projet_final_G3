@@ -39,7 +39,7 @@ class TurbulenceDetector:
                 # Nouvel avion détecté: initialiser une deque pour son historique
                 self.history[plane_name] = deque(maxlen=self.window_size)
 
-            # Ajouter l'état courant de l'avion à son historique
+            # Ajouter l'état courant de l'avion à son historiquen
             self.history[plane_name].append((lat, lon, alt, vr))
 
         # Identifier les avions qui ont disparu (présents auparavant mais pas dans le states_df actuel)

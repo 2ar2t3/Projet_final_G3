@@ -28,9 +28,6 @@ class Main:
             states = OpenSky().get_json(self.bbox)
             turbulences_recentes = self.detector.update(states)
 
-            print(turbulences_recentes)
-            print(self.turbulences_actives)
-
             if turbulences_recentes.size:
                 if self.turbulences_actives.size:
                     meteo_old = OpenMeteo(self.turbulences_actives).resultats
@@ -61,9 +58,8 @@ class Main:
                     self.to_display = turbulences_deplacees.copy()
                 "affichage anciennes avec météo pour anciennes"
 
-            print("avant refresh1")
             time.sleep(3)
-            print("apres refresh1")
+
 
 
             meteo_new = OpenMeteo(self.turbulences_actives).resultats
@@ -73,7 +69,6 @@ class Main:
             with self.lock:
                 self.to_display = turbulences_deplacees.copy()
 
-            print("avant refresh2")
             time.sleep(3)
-            print("apres refresh2")
+
 
