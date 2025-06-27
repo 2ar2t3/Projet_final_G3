@@ -3,7 +3,7 @@ Collaborateurs: Arthur Aussedat-Pretet, Victor Laloi, Vladislav Liksutin
 
 ### A ajouter : 
 
-Introduction au code (contexte, utilité, pertinence, cadre d’utilisation)
+0. Introduction au code (contexte, utilité, pertinence, cadre d’utilisation)
 1. Fonctionnalités
 2. Aspects généraux
 3. Instructions d’installation et d’utilisation (dépendances particulières)
