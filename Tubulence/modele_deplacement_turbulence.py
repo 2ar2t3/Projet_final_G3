@@ -39,9 +39,9 @@ def deplacement_turbulence(turbulence_data, meteo_data, delta_t=60):
         # Expansion ou contraction du diamètre
         delta_diam = (abs(cis_haut) + abs(cis_bas)) * 0.01  # facteur arbitraire
 
-        nouvelle_confiance = max(conf*0.98, 0)
+        nouvelle_confiance = conf*0.95
 
-        if nouvelle_confiance == 0:
+        if nouvelle_confiance <= 0.2:
             continue
 
         new_data.append([
