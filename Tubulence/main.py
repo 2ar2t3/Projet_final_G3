@@ -15,8 +15,8 @@ class Main:
         self.detector = TurbulenceDetector(window_size=5)
 
         # lon, lat, alt, diametre  (historique complet)
-        self.turbulences_actives = np.empty((0, 4), float)
-        self.to_display = np.empty((0, 4), float)
+        self.turbulences_actives = np.empty((0, 5), float)
+        self.to_display = np.empty((0, 5), float)
 
         self.lock = threading.Lock()
 

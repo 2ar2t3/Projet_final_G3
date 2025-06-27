@@ -75,7 +75,7 @@ class OpenMeteo:
         result = np.empty((n, 4), dtype=float)
 
         # Itèration sur chaque turbulence active
-        for turb, (lat, lon, niv, _) in enumerate(array_hpa):
+        for turb, (lat, lon, niv, _, _) in enumerate(array_hpa):
 
             # Normalisation du niveau souhaité au plus proche disponible
             niveau = int(self.niveau_proche(niv))
