@@ -1,19 +1,54 @@
+"""
+turbulence.py ― Détection d’instabilités sur trajectoires ADS-B
+===============================================================
+
+Composant cœur du projet **ETS_en_Turbulence** (MGA802, ÉTS Montréal).
+
+Rôle
+----
+Analyse, pour chaque avion suivi, une fenêtre glissante de vitesses
+verticales (`vertical_rate`) afin de confirmer ou non la présence
+d’une **turbulence** :
+
+1. **Historique** par appareil (latitude, longitude, altitude, *vr*).
+2. **Instabilité provisoire** : au moins 3 ticks instables consécutifs.
+3. **Turbulence confirmée** : fin lorsque l’avion redevient stable 2 ticks.
+4. **Sortie** : événements terminés ⟶ centre + diamètre en km.
+"""
+
+
 import math
 from collections import deque
 import numpy as np
-import pandas as pd
 
 class TurbulenceDetector:
+    """
+    Détecteur d’instabilités verticales sur une fenêtre glissante.
+
+    Parameters
+    ----------
+    window_size : int, default ``5``
+        Nombre de ticks conservés dans l’historique pour chaque avion.
+
+    Attributes
+    ----------
+    history : dict[str, deque[tuple]]
+        Derniers états `(lat, lon, alt, vr)` par appareil.
+    instabilite_provisoire : dict[str, dict]
+        Compteurs d’instabilité en attente de validation.
+    turbulence_en_cours : dict[str, dict]
+        Turbulences confirmées non encore clôturées.
+    """
+
     def __init__(self, window_size=5):
-        """
-        Initialise le détecteur de turbulences.
-        :param window_size: nombre de ticks à conserver dans l'historique pour chaque avion.
-        """
         self.window_size = window_size
+
         # Historique des derniers états pour chaque avion: {nom_avion: deque[maxlen=window_size] de tuples (lat, lon, alt, vr)}
         self.history = {}
+
         # Instabilités provisoires: {nom_avion: {"count": nb_ticks_instables_consecutifs, "start": (lat, lon, alt)}}
         self.instabilite_provisoire = {}
+
         # Turbulences en cours: {nom_avion: {"start": (lat, lon, alt), "end": (lat, lon, alt) ou None, "stable_count": nb_ticks_stables_consecutifs}}
         self.turbulence_en_cours = {}
 

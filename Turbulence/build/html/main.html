@@ -307,32 +307,101 @@
                   
   <section id="module-main">
 <span id="main-module"></span><h1>main module<a class="headerlink" href="#module-main" title="Lien vers cette rubrique">#</a></h1>
+<section id="main-py-orchestrateur-temps-reel">
+<h2>main.py ― Orchestrateur temps réel<a class="headerlink" href="#main-py-orchestrateur-temps-reel" title="Lien vers cette rubrique">#</a></h2>
+<p>Boucle de suivi et de prévision des turbulences pour le projet
+<strong>ETS_en_Turbulence</strong> (cours MGA802, ÉTS Montréal).</p>
+<ol class="arabic simple">
+<li><p><strong>Collecte</strong> les états ADS-B via l’API OpenSky.</p></li>
+<li><p><strong>Détecte</strong> les turbulences avec <a class="reference internal" href="turbulence.html#turbulence.TurbulenceDetector" title="turbulence.TurbulenceDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">turbulence.TurbulenceDetector</span></code></a>.</p></li>
+<li><p><strong>Interroge</strong> Open-Meteo pour connaître les vents locaux.</p></li>
+<li><p><strong>Fait dériver</strong> chaque cellule turbulente selon le vent (advection).</p></li>
+<li><p><strong>Publie</strong> un tableau NumPy thread-safe <code class="docutils literal notranslate"><span class="pre">self.to_display</span></code> consommé par
+l’interface Streamlit.</p></li>
+</ol>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="main.Main">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">Main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.Main" title="Lien vers cette définition">#</a></dt>
 <dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Collecte ADS-B, cumule les turbulences, déclenche l’affichage.</p>
+<p>Orchestrateur temps réel du pipeline ADS-B → Turbulence → Météo.</p>
+<section id="parametres">
+<h2>Paramètres<a class="headerlink" href="#parametres" title="Lien vers cette rubrique">#</a></h2>
+<dl class="simple">
+<dt>bbox<span class="classifier">tuple[float, float, float, float] | None, optional</span></dt><dd><p><em>(min_lon, max_lon, min_lat, max_lat)</em>.
+<code class="docutils literal notranslate"><span class="pre">None</span></code> ⇒ requête monde entier (⚠︎ volumineux).</p>
+</dd>
+</dl>
+</section>
+<section id="attributs">
+<h2>Attributs<a class="headerlink" href="#attributs" title="Lien vers cette rubrique">#</a></h2>
+<dl class="simple">
+<dt>bbox<span class="classifier">tuple | None</span></dt><dd><p>Zone interrogeable passée au constructeur.</p>
+</dd>
+<dt>detector<span class="classifier">TurbulenceDetector</span></dt><dd><p>Fenêtre glissante de 5 ticks pour la détection.</p>
+</dd>
+<dt>turbulences_actives<span class="classifier">numpy.ndarray</span></dt><dd><p>Tableau <em>(N, 5)</em> <cite>[lon, lat, alt, diam, timestamp]</cite>.</p>
+</dd>
+<dt>to_display<span class="classifier">numpy.ndarray</span></dt><dd><p>Copie protégée de <code class="docutils literal notranslate"><span class="pre">turbulences_actives</span></code> destinée au front-end.</p>
+</dd>
+<dt>lock<span class="classifier">threading.Lock</span></dt><dd><p>Verrou garantissant l’accès thread-safe à <code class="docutils literal notranslate"><span class="pre">to_display</span></code>.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="main.Main.loop">
 <span class="sig-name descname"><span class="pre">loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.Main.loop" title="Lien vers cette définition">#</a></dt>
-<dd><p>Boucle principale exécutée en arrière-plan, combinant acquisition de données,
-détection de turbulences, ajustement météorologique et mise à jour de l’affichage.</p>
-<p>Cette méthode tourne en continu (bloquante) et effectue les opérations suivantes :</p>
+<dd><p>Boucle principale exécutée en arrière-plan.</p>
+<p>Cette méthode tourne indéfiniment dans un thread <em>daemon</em> et enchaîne
+périodiquement les opérations suivantes :</p>
+<ol class="arabic simple">
+<li><p><strong>Acquisition ADS-B</strong> – interroge l’API <em>OpenSky</em> pour obtenir
+l’état instantané des aéronefs dans la <em>bounding box</em> <code class="docutils literal notranslate"><span class="pre">self.bbox</span></code>.</p></li>
+<li><p><strong>Détection de turbulences</strong> – transmet les nouveaux états
+au <a class="reference internal" href="turbulence.html#turbulence.TurbulenceDetector" title="turbulence.TurbulenceDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">turbulence.TurbulenceDetector</span></code></a> qui renvoie les cellules
+turbulentes fraîchement identifiées.</p></li>
+<li><p><strong>Mise à jour des cellules existantes</strong> – récupère la météo locale
+via <a class="reference internal" href="requetes_meteo.html#requetes_meteo.OpenMeteo" title="requetes_meteo.OpenMeteo"><code class="xref py py-class docutils literal notranslate"><span class="pre">requetes_meteo.OpenMeteo</span></code></a> puis fait dériver chacune des
+cellules déjà actives selon le vent
+(<a class="reference internal" href="modele_deplacement_turbulence.html#modele_deplacement_turbulence.deplacement_turbulence" title="modele_deplacement_turbulence.deplacement_turbulence"><code class="xref py py-func docutils literal notranslate"><span class="pre">modele_deplacement_turbulence.deplacement_turbulence()</span></code></a>).</p></li>
+<li><p><strong>Fusion</strong> – empile les turbulences déplacées et les nouvelles pour
+obtenir l’état global <code class="docutils literal notranslate"><span class="pre">self.turbulences_actives</span></code>.</p></li>
+<li><p><strong>Publication thread-safe</strong> – copie atomiquement cet état dans
+<code class="docutils literal notranslate"><span class="pre">self.to_display</span></code> afin que l’interface Streamlit puisse l’afficher
+sans risque de condition de course.</p></li>
+<li><p><strong>Temporisation</strong> – attend 3 s avant de reprendre le cycle.</p></li>
+</ol>
+<p>Les cellules turbulentes sont stockées dans des tableaux NumPy
+de forme <em>(N, 5)</em> avec les colonnes</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">altitude</span><span class="p">,</span> <span class="n">diametre</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong></p>
+</dd>
+<dt class="field-even">Renvoie<span class="colon">:</span></dt>
+<dd class="field-even"><p>La fonction est bloquante : elle ne renvoie jamais de valeur et ne
+se termine qu’à l’arrêt du programme.</p>
+</dd>
+<dt class="field-odd">Type renvoyé<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
 <ul class="simple">
-<li><p>Récupère les données d’avions via l’API OpenSky dans une zone définie (<cite>self.bbox</cite>)</p></li>
-<li><p>Met à jour la détection de turbulences avec les nouveaux états reçus</p></li>
-<li><p>Si de nouvelles turbulences sont détectées, elles sont fusionnées avec les précédentes,
-après ajustement météorologique</p></li>
-<li><p>Met à jour la variable <cite>self.to_display</cite> pour un affichage thread-safe</p></li>
-<li><p>Applique un décalage météorologique régulier à toutes les turbulences détectées</p></li>
-<li><p>Fait une pause de 3 secondes entre chaque cycle de traitement</p></li>
+<li><p><strong>Cadence effective</strong> ≈ 6 s : ~3 s de traitement + 3 s de pause.</p></li>
+<li><p>L’accès au tableau publié (<cite>self.to_display</cite>) est protégé par
+un <code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Lock</span></code> (<code class="docutils literal notranslate"><span class="pre">self.lock</span></code>).</p></li>
+<li><p>Les données météo et ADS-B sont externes ; prévois une gestion
+d’exception si l’une des API devient indisponible.</p></li>
 </ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Cette fonction doit être exécutée dans un thread séparé car elle ne se termine jamais.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Voir aussi</p>
+<p><a class="reference internal" href="requetes_opensky.html#requetes_opensky.OpenSky" title="requetes_opensky.OpenSky"><code class="xref py py-class docutils literal notranslate"><span class="pre">requetes_opensky.OpenSky</span></code></a>, <a class="reference internal" href="turbulence.html#turbulence.TurbulenceDetector" title="turbulence.TurbulenceDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">turbulence.TurbulenceDetector</span></code></a>, <a class="reference internal" href="requetes_meteo.html#requetes_meteo.OpenMeteo" title="requetes_meteo.OpenMeteo"><code class="xref py py-class docutils literal notranslate"><span class="pre">requetes_meteo.OpenMeteo</span></code></a>, <a class="reference internal" href="modele_deplacement_turbulence.html#modele_deplacement_turbulence.deplacement_turbulence" title="modele_deplacement_turbulence.deplacement_turbulence"><code class="xref py py-func docutils literal notranslate"><span class="pre">modele_deplacement_turbulence.deplacement_turbulence()</span></code></a></p>
 </div>
 </dd></dl>
 
+</section>
 </dd></dl>
 
 </section>
@@ -384,6 +453,7 @@ après ajustement météorologique</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-py-orchestrateur-temps-reel">main.py ― Orchestrateur temps réel</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main.Main"><code class="docutils literal notranslate"><span class="pre">Main</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#main.Main.loop"><code class="docutils literal notranslate"><span class="pre">Main.loop()</span></code></a></li>
 </ul>

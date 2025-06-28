@@ -307,16 +307,39 @@
                   
   <section id="module-affiche_carte">
 <span id="affiche-carte-module"></span><h1>affiche_carte module<a class="headerlink" href="#module-affiche_carte" title="Lien vers cette rubrique">#</a></h1>
+<section id="affiche-carte-py-visualisation-streamlit-pydeck">
+<h2>affiche_carte.py ― Visualisation Streamlit/PyDeck<a class="headerlink" href="#affiche-carte-py-visualisation-streamlit-pydeck" title="Lien vers cette rubrique">#</a></h2>
+<p>Module d’affichage du projet <em>ETS_en_Turbulence</em> (MGA802, ÉTS Montréal).</p>
+<p>Il expose deux classes :</p>
+<ul class="simple">
+<li><p><strong>Data</strong>  – Convertit un tableau NumPy/Python en <code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>
+enrichi (colonnes géographiques + métadonnées).</p></li>
+<li><p><strong>Carte</strong> – Affiche toutes les zones de turbulence dans une unique
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pydeck.Layer</span></code> <em>Scatterplot</em>, avec couleur/diamètre/opacité
+paramétrés par la confiance et le diamètre estimé.</p></li>
+</ul>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="affiche_carte.Carte">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">affiche_carte.</span></span><span class="sig-name descname"><span class="pre">Carte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">data_objects</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#affiche_carte.Carte" title="Lien vers cette définition">#</a></dt>
 <dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Affiche une carte interactive des zones de turbulence à l’aide de PyDeck et Streamlit.</p>
+<p>Carte interactive PyDeck des turbulences en cours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>*data_objects</strong> (<a class="reference internal" href="#affiche_carte.Data" title="affiche_carte.Data"><em>Data</em></a>) – Un ou plusieurs objets <a class="reference internal" href="#affiche_carte.Data" title="affiche_carte.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a> fournissant chacun un
+DataFrame à afficher.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="affiche_carte.Carte.affichage">
 <span class="sig-name descname"><span class="pre">affichage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#affiche_carte.Carte.affichage" title="Lien vers cette définition">#</a></dt>
-<dd><p>Affiche la carte avec toutes les zones de turbulence.
-Utilise une seule couche <cite>ScatterplotLayer</cite> avec des couleurs variables selon la confiance.</p>
+<dd><p>Affiche la carte dans Streamlit (<cite>st.pydeck_chart</cite>).</p>
+<ul class="simple">
+<li><p>Concatène tous les DataFrames.</p></li>
+<li><p>Calcule une couleur RGBA par ligne
+(rouge = confiance 100 %, bleu translucide sinon).</p></li>
+<li><p>Rend une seule <em>ScatterplotLayer</em> pour plus de performance.</p></li>
+</ul>
 </dd></dl>
 
 </dd></dl>
@@ -325,8 +348,37 @@ Utilise une seule couche <cite>ScatterplotLayer</cite> avec des couleurs variabl
 <dt class="sig sig-object py" id="affiche_carte.Data">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">affiche_carte.</span></span><span class="sig-name descname"><span class="pre">Data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tableau_turbulences</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'originale'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#affiche_carte.Data" title="Lien vers cette définition">#</a></dt>
 <dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Représente un ensemble de zones de turbulence avec leur origine (étiquette).
-Permet la conversion vers un DataFrame enrichi pour visualisation.</p>
+<p>Convertit un tableau de turbulences en DataFrame prêt pour PyDeck.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tableau_turbulences</strong> (<em>list</em><em> | </em><em>numpy.ndarray</em>) – Tableau <em>(N, 5)</em> – <cite>[lat, lon, alt, diam, confiance]</cite>.</p></li>
+<li><p><strong>label</strong> (str, default <code class="docutils literal notranslate"><span class="pre">&quot;originale&quot;</span></code>) – Étiquette de provenance (p. ex. « originale », « prédite »).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="affiche_carte.Data.turbulences">
+<span class="sig-name descname"><span class="pre">turbulences</span></span><a class="headerlink" href="#affiche_carte.Data.turbulences" title="Lien vers cette définition">#</a></dt>
+<dd><p>Données brutes conservées telles quelles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray | list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="affiche_carte.Data.label">
+<span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#affiche_carte.Data.label" title="Lien vers cette définition">#</a></dt>
+<dd><p>Étiquette passée au constructeur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="affiche_carte.Data.generer_dataframe">
 <span class="sig-name descname"><span class="pre">generer_dataframe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#affiche_carte.Data.generer_dataframe" title="Lien vers cette définition">#</a></dt>
@@ -392,11 +444,14 @@ Permet la conversion vers un DataFrame enrichi pour visualisation.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#affiche-carte-py-visualisation-streamlit-pydeck">affiche_carte.py ― Visualisation Streamlit/PyDeck</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#affiche_carte.Carte"><code class="docutils literal notranslate"><span class="pre">Carte</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#affiche_carte.Carte.affichage"><code class="docutils literal notranslate"><span class="pre">Carte.affichage()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#affiche_carte.Data"><code class="docutils literal notranslate"><span class="pre">Data</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#affiche_carte.Data.turbulences"><code class="docutils literal notranslate"><span class="pre">Data.turbulences</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#affiche_carte.Data.label"><code class="docutils literal notranslate"><span class="pre">Data.label</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#affiche_carte.Data.generer_dataframe"><code class="docutils literal notranslate"><span class="pre">Data.generer_dataframe()</span></code></a></li>
 </ul>
 </li>

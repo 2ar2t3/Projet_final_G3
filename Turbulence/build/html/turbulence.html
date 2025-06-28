@@ -306,10 +306,65 @@
                   
   <section id="module-turbulence">
 <span id="turbulence-module"></span><h1>turbulence module<a class="headerlink" href="#module-turbulence" title="Lien vers cette rubrique">#</a></h1>
+<section id="turbulence-py-detection-dinstabilites-sur-trajectoires-ads-b">
+<h2>turbulence.py ― Détection d’instabilités sur trajectoires ADS-B<a class="headerlink" href="#turbulence-py-detection-dinstabilites-sur-trajectoires-ads-b" title="Lien vers cette rubrique">#</a></h2>
+<p>Composant cœur du projet <strong>ETS_en_Turbulence</strong> (MGA802, ÉTS Montréal).</p>
+<section id="role">
+<h3>Rôle<a class="headerlink" href="#role" title="Lien vers cette rubrique">#</a></h3>
+<p>Analyse, pour chaque avion suivi, une fenêtre glissante de vitesses
+verticales (<cite>vertical_rate</cite>) afin de confirmer ou non la présence
+d’une <strong>turbulence</strong> :</p>
+<ol class="arabic simple">
+<li><p><strong>Historique</strong> par appareil (latitude, longitude, altitude, <em>vr</em>).</p></li>
+<li><p><strong>Instabilité provisoire</strong> : au moins 3 ticks instables consécutifs.</p></li>
+<li><p><strong>Turbulence confirmée</strong> : fin lorsque l’avion redevient stable 2 ticks.</p></li>
+<li><p><strong>Sortie</strong> : événements terminés ⟶ centre + diamètre en km.</p></li>
+</ol>
+</section>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="turbulence.TurbulenceDetector">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">turbulence.</span></span><span class="sig-name descname"><span class="pre">TurbulenceDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#turbulence.TurbulenceDetector" title="Lien vers cette définition">#</a></dt>
 <dd><p>Bases : <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Détecteur d’instabilités verticales sur une fenêtre glissante.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Paramètres<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>window_size</strong> (int, default <code class="docutils literal notranslate"><span class="pre">5</span></code>) – Nombre de ticks conservés dans l’historique pour chaque avion.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="turbulence.TurbulenceDetector.history">
+<span class="sig-name descname"><span class="pre">history</span></span><a class="headerlink" href="#turbulence.TurbulenceDetector.history" title="Lien vers cette définition">#</a></dt>
+<dd><p>Derniers états <cite>(lat, lon, alt, vr)</cite> par appareil.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, deque[tuple]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="turbulence.TurbulenceDetector.instabilite_provisoire">
+<span class="sig-name descname"><span class="pre">instabilite_provisoire</span></span><a class="headerlink" href="#turbulence.TurbulenceDetector.instabilite_provisoire" title="Lien vers cette définition">#</a></dt>
+<dd><p>Compteurs d’instabilité en attente de validation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="turbulence.TurbulenceDetector.turbulence_en_cours">
+<span class="sig-name descname"><span class="pre">turbulence_en_cours</span></span><a class="headerlink" href="#turbulence.TurbulenceDetector.turbulence_en_cours" title="Lien vers cette définition">#</a></dt>
+<dd><p>Turbulences confirmées non encore clôturées.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict[str, dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="turbulence.TurbulenceDetector.centre_turbulence">
 <span class="sig-name descname"><span class="pre">centre_turbulence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">turb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#turbulence.TurbulenceDetector.centre_turbulence" title="Lien vers cette définition">#</a></dt>
@@ -455,7 +510,14 @@ contenant les coordonnées de début et de fin, ainsi que la distance horizontal
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence-py-detection-dinstabilites-sur-trajectoires-ads-b">turbulence.py ― Détection d’instabilités sur trajectoires ADS-B</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#role">Rôle</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence.TurbulenceDetector"><code class="docutils literal notranslate"><span class="pre">TurbulenceDetector</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence.TurbulenceDetector.history"><code class="docutils literal notranslate"><span class="pre">TurbulenceDetector.history</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence.TurbulenceDetector.instabilite_provisoire"><code class="docutils literal notranslate"><span class="pre">TurbulenceDetector.instabilite_provisoire</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence.TurbulenceDetector.turbulence_en_cours"><code class="docutils literal notranslate"><span class="pre">TurbulenceDetector.turbulence_en_cours</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence.TurbulenceDetector.centre_turbulence"><code class="docutils literal notranslate"><span class="pre">TurbulenceDetector.centre_turbulence()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence.TurbulenceDetector.distance_horizontale_km"><code class="docutils literal notranslate"><span class="pre">TurbulenceDetector.distance_horizontale_km()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbulence.TurbulenceDetector.instabilite_detectee"><code class="docutils literal notranslate"><span class="pre">TurbulenceDetector.instabilite_detectee()</span></code></a></li>

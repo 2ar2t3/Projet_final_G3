@@ -307,6 +307,17 @@
                   
   <section id="module-requetes_meteo">
 <span id="requetes-meteo-module"></span><h1>requetes_meteo module<a class="headerlink" href="#module-requetes_meteo" title="Lien vers cette rubrique">#</a></h1>
+<section id="openmeteo-recuperation-des-vents-atmospheriques">
+<h2>OpenMeteo ― Récupération des vents atmosphériques<a class="headerlink" href="#openmeteo-recuperation-des-vents-atmospheriques" title="Lien vers cette rubrique">#</a></h2>
+<p>Module utilitaire du projet <em>ETS_en_Turbulence</em> (MGA802, ÉTS Montréal).</p>
+<p>Il interroge l’API <cite>https://api.open-meteo.com/</cite> afin d’obtenir, pour chaque
+cellule turbulente détectée :</p>
+<ul class="simple">
+<li><p>vitesse du vent (m/s) au niveau de pression le plus proche ;</p></li>
+<li><p>direction du vent (degrés) ;</p></li>
+<li><p>cisaillement vertical juste au-dessus et juste au-dessous.</p></li>
+</ul>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="requetes_meteo.OpenMeteo">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">requetes_meteo.</span></span><span class="sig-name descname"><span class="pre">OpenMeteo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#requetes_meteo.OpenMeteo" title="Lien vers cette définition">#</a></dt>
@@ -433,6 +444,7 @@ Seules les 3 premières colonnes sont utilisées ici.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#openmeteo-recuperation-des-vents-atmospheriques">OpenMeteo ― Récupération des vents atmosphériques</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requetes_meteo.OpenMeteo"><code class="docutils literal notranslate"><span class="pre">OpenMeteo</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requetes_meteo.OpenMeteo.conversion_altitude_en_hpa"><code class="docutils literal notranslate"><span class="pre">OpenMeteo.conversion_altitude_en_hpa()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requetes_meteo.OpenMeteo.donnees_vent"><code class="docutils literal notranslate"><span class="pre">OpenMeteo.donnees_vent()</span></code></a></li>

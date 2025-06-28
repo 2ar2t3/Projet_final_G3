@@ -16,8 +16,8 @@ Projet de session – MGA802 (ÉTS Montréal)
   les variations verticales d’altitude, la vitesse air, et la charge g ;
 * **interroge l’API Open-Meteo** pour récupérer les champs météo (vents, cisaillement, CAPE)
   au point de turbulence ;
-* **propage la cellule turbulente** (advection) selon le vent prévu afin d’anticiper
-  son déplacement dans les minutes suivantes.
+* **propage la cellule turbulente** (advection) selon le vent prévu afin d'afficher'
+  son déplacement en temps réel.
 
 Architecture du dépôt
 ~~~~~~~~~~~~~~~~~~~~~

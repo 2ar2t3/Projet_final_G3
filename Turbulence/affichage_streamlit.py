@@ -1,7 +1,29 @@
+"""
+Streamlit dashboard ― *ETS_en_Turbulence*
+========================================
+
+Interface graphique du projet MGA802 (ÉTS Montréal).
+
+Fonctionnalité
+--------------
+1. **Instancie** une seule fois le collecteur temps réel
+   :class:`main.Main` (thread *daemon*) et le stocke dans
+   :pydata:`st.session_state`.
+2. **Récupère** à chaque rafraîchissement la copie thread-safe
+   ``app.to_display`` (NumPy *(N, 4)* : lon, lat, alt, diam).
+3. **Affiche** la carte des turbulences via
+   :class:`affiche_carte.Data` + :class:`affiche_carte.Carte`.
+4. **Montre** une légende (couleur, taille, opacité) et un exemple de
+   cisaillement sous forme de bulles bleues.
+5. **Auto-rafraîchit** la page toutes les 3 s grâce à
+   :func:`streamlit_autorefresh.st_autorefresh`.
+
+"""
+
+
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 import matplotlib.pyplot as plt
-import numpy as np
 
 from main            import Main           # ta classe avec le thread
 from affiche_carte   import Data, Carte    # tes classes d’affichage
@@ -26,10 +48,10 @@ st.header("🌪️  Carte des turbulences (auto-refresh 3 s)")
 
 if points.size:
     # points est déjà au bon format pour Data :
-    #   colonne 0 : lon   | colonne 1 : lat | 2 : alt | 3 : diam
+    # colonne 0 : lon | colonne 1 : lat | 2 : alt | 3 : diam
     Carte(Data(points)).affichage()
-    st.markdown("### 🧭 Légende de la carte")
 
+    st.markdown("### 🧭 Légende de la carte")
     col1, col2 = st.columns([1, 3])
 
     with col1:
@@ -49,7 +71,6 @@ if points.size:
         ax.set_ylim(0, 1)
         ax.axis("off")
 
-        # Exemples de turbulences bleues à différents niveaux de confiance
         niveaux = [0 ,10, 30, 50, 70, 90, 100]
         couleurs = [[0, 0, 1, conf / 100] for conf in niveaux]
         tailles = [300 + conf * 2 for conf in niveaux]

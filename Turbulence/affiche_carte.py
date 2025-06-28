@@ -1,23 +1,43 @@
+"""
+affiche_carte.py ― Visualisation Streamlit/PyDeck
+=================================================
+
+Module d’affichage du projet *ETS_en_Turbulence* (MGA802, ÉTS Montréal).
+
+Il expose deux classes :
+
+* **Data**  – Convertit un tableau NumPy/Python en :class:`pandas.DataFrame`
+  enrichi (colonnes géographiques + métadonnées).
+* **Carte** – Affiche toutes les zones de turbulence dans une unique
+  :class:`pydeck.Layer` *Scatterplot*, avec couleur/diamètre/opacité
+  paramétrés par la confiance et le diamètre estimé.
+"""
+
+
 import streamlit as st
 import pandas as pd
-import numpy as np
 import pydeck as pdk
-from modele_deplacement_turbulence import *
+
 
 class Data:
     """
-        Représente un ensemble de zones de turbulence avec leur origine (étiquette).
-        Permet la conversion vers un DataFrame enrichi pour visualisation.
+    Convertit un tableau de turbulences en DataFrame prêt pour PyDeck.
+
+    Parameters
+    ----------
+    tableau_turbulences : list | numpy.ndarray
+        Tableau *(N, 5)* – `[lat, lon, alt, diam, confiance]`.
+    label : str, default ``"originale"``
+        Étiquette de provenance (p. ex. « originale », « prédite »).
+
+    Attributes
+    ----------
+    turbulences : numpy.ndarray | list
+        Données brutes conservées telles quelles.
+    label : str
+        Étiquette passée au constructeur.
     """
     def __init__(self, tableau_turbulences, label="originale",):
-        """
-               Initialise les données de turbulence.
-
-               :param tableau_turbulences: Tableau (liste ou ndarray) contenant les zones de turbulence.
-                   Chaque entrée doit être [latitude, longitude, altitude, diamètre, confiance].
-               :param label: Étiquette utilisée pour identifier l’origine des données.
-        """
-
         self.turbulences = tableau_turbulences
         self.label = label
 
@@ -35,20 +55,26 @@ class Data:
 
 class Carte:
     """
-       Affiche une carte interactive des zones de turbulence à l’aide de PyDeck et Streamlit.
-    """
-    def __init__(self, *data_objects):
-        """
-                Initialise la carte avec un ou plusieurs objets `TurbulenceData`.
+    Carte interactive PyDeck des turbulences en cours.
 
-                :param data_objects: Un ou plusieurs objets TurbulenceData.
-        """
+    Parameters
+    ----------
+    *data_objects : Data
+        Un ou plusieurs objets :class:`Data` fournissant chacun un
+        DataFrame à afficher.
+    """
+
+    def __init__(self, *data_objects):
         self.data_objects = data_objects
 
     def affichage(self):
         """
-                Affiche la carte avec toutes les zones de turbulence.
-                Utilise une seule couche `ScatterplotLayer` avec des couleurs variables selon la confiance.
+        Affiche la carte dans Streamlit (`st.pydeck_chart`).
+
+        - Concatène tous les DataFrames.
+        - Calcule une couleur RGBA par ligne
+          (rouge = confiance 100 %, bleu translucide sinon).
+        - Rend une seule *ScatterplotLayer* pour plus de performance.
         """
         dfs = [data_obj.generer_dataframe() for data_obj in self.data_objects]
         df_all = pd.concat(dfs)

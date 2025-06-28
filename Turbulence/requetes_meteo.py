@@ -1,5 +1,22 @@
+"""
+OpenMeteo ― Récupération des vents atmosphériques
+=================================================
+
+Module utilitaire du projet *ETS_en_Turbulence* (MGA802, ÉTS Montréal).
+
+Il interroge l’API `https://api.open-meteo.com/` afin d’obtenir, pour chaque
+cellule turbulente détectée :
+
+* vitesse du vent (m/s) au niveau de pression le plus proche ;
+* direction du vent (degrés) ;
+* cisaillement vertical juste au-dessus et juste au-dessous.
+
+"""
+
+
 import requests
 import numpy as np
+
 
 class OpenMeteo:
 

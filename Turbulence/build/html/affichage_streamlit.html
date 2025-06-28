@@ -307,6 +307,26 @@
                   
   <section id="module-affichage_streamlit">
 <span id="affichage-streamlit-module"></span><h1>affichage_streamlit module<a class="headerlink" href="#module-affichage_streamlit" title="Lien vers cette rubrique">#</a></h1>
+<section id="streamlit-dashboard-ets-en-turbulence">
+<h2>Streamlit dashboard ― <em>ETS_en_Turbulence</em><a class="headerlink" href="#streamlit-dashboard-ets-en-turbulence" title="Lien vers cette rubrique">#</a></h2>
+<p>Interface graphique du projet MGA802 (ÉTS Montréal).</p>
+<section id="fonctionnalite">
+<h3>Fonctionnalité<a class="headerlink" href="#fonctionnalite" title="Lien vers cette rubrique">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Instancie</strong> une seule fois le collecteur temps réel
+<a class="reference internal" href="main.html#main.Main" title="main.Main"><code class="xref py py-class docutils literal notranslate"><span class="pre">main.Main</span></code></a> (thread <em>daemon</em>) et le stocke dans
+<a href="#id1"><span class="problematic" id="id2">:pydata:`st.session_state`</span></a>.</p></li>
+<li><p><strong>Récupère</strong> à chaque rafraîchissement la copie thread-safe
+<code class="docutils literal notranslate"><span class="pre">app.to_display</span></code> (NumPy <em>(N, 4)</em> : lon, lat, alt, diam).</p></li>
+<li><p><strong>Affiche</strong> la carte des turbulences via
+<a class="reference internal" href="affiche_carte.html#affiche_carte.Data" title="affiche_carte.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">affiche_carte.Data</span></code></a> + <a class="reference internal" href="affiche_carte.html#affiche_carte.Carte" title="affiche_carte.Carte"><code class="xref py py-class docutils literal notranslate"><span class="pre">affiche_carte.Carte</span></code></a>.</p></li>
+<li><p><strong>Montre</strong> une légende (couleur, taille, opacité) et un exemple de
+cisaillement sous forme de bulles bleues.</p></li>
+<li><p><strong>Auto-rafraîchit</strong> la page toutes les 3 s grâce à
+<code class="xref py py-func docutils literal notranslate"><span class="pre">streamlit_autorefresh.st_autorefresh()</span></code>.</p></li>
+</ol>
+</section>
+</section>
 </section>
 
 
@@ -347,6 +367,21 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Sur cette page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streamlit-dashboard-ets-en-turbulence">Streamlit dashboard ― <em>ETS_en_Turbulence</em></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fonctionnalite">Fonctionnalité</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">
