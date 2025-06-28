@@ -24,19 +24,21 @@ class Main:
 
     def loop(self):
         """
-        Boucle principale exécutée en arrière-plan, combinant acquisition de données, détection de turbulences,
-        ajustement météorologique et mise à jour de l’affichage.
+        Boucle principale exécutée en arrière-plan, combinant acquisition de données,
+        détection de turbulences, ajustement météorologique et mise à jour de l’affichage.
 
-        Cette méthode tourne en continu (bloquante) :
+        Cette méthode tourne en continu (bloquante) et effectue les opérations suivantes :
+
         - Récupère les données d'avions via l'API OpenSky dans une zone définie (`self.bbox`)
         - Met à jour la détection de turbulences avec les nouveaux états reçus
-        - Si de nouvelles turbulences sont détectées, elles sont fusionnées avec les précédentes
-          après ajustement par la météo
+        - Si de nouvelles turbulences sont détectées, elles sont fusionnées avec les précédentes,
+          après ajustement météorologique
         - Met à jour la variable `self.to_display` pour un affichage thread-safe
         - Applique un décalage météorologique régulier à toutes les turbulences détectées
         - Fait une pause de 3 secondes entre chaque cycle de traitement
 
-        :note: Cette fonction doit être exécutée dans un thread séparé car elle ne se termine jamais.
+        .. note::
+            Cette fonction doit être exécutée dans un thread séparé car elle ne se termine jamais.
         """
         while True:
             # Récupération des données d'états d'avions dans la zone bbox
