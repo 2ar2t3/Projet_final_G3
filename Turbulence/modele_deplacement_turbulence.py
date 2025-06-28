@@ -4,16 +4,31 @@ import numpy as np
 
 def deplacement_turbulence(turbulence_data, meteo_data, delta_t=60):
     """
-    Simule le déplacement de turbulences sur une période delta_t (en secondes).
+        Simule le déplacement et l'évolution des zones de turbulence sous l'effet du vent et du cisaillement.
 
-    Paramètres :
-    - turbulence_data : np.ndarray (n, 5) -> [latitude, longitude, altitude, diamètre, confiance]
-    - meteo_data : np.ndarray (n, 4) -> [vitesse_vent (m/s), direction_vent (°), cisaillement_haut, cisaillement_bas]
-    - delta_t : temps écoulé en secondes (par défaut 60s)
+        Cette fonction prend en entrée des données représentant des zones de turbulence, ainsi que des
+        données météorologiques correspondantes. Elle calcule le nouveau positionnement de chaque zone
+        en tenant compte du déplacement dû au vent (direction et vitesse), du cisaillement vertical
+        de l'air (modifiant l'altitude et le diamètre), et d'une décroissance de la confiance associée.
+        Les zones dont la confiance devient trop faible sont ignorées dans le résultat final.
 
-    Retourne :
-    - np.ndarray (n, 5) avec les nouvelles positions
-    """
+
+        :param turbulence_data: Un tableau contenant les zones de turbulence à simuler. Chaque ligne doit contenir :
+            ``latitude``, ``longitude``, ``altitude``, ``diamètre``, ``confiance``.
+        :type turbulence_data: numpy.ndarray
+
+        :param meteo_data: Un tableau contenant les données météorologiques associées à chaque zone.
+            Chaque ligne doit contenir : ``vitesse du vent (m/s)``, ``direction (degrés)``,
+            ``cisaillement haut``, ``cisaillement bas``.
+        :type meteo_data: numpy.ndarray
+
+        :param delta_t: Durée du pas de temps en secondes pour le calcul du déplacement. Par défaut : 60.
+        :type delta_t: float
+
+        :return: Un tableau numpy contenant les nouvelles zones de turbulence conservées,
+            avec leurs nouvelles positions, altitudes, diamètres et niveaux de confiance.
+        :rtype: numpy.ndarray
+        """
     # Constantes pour conversion approximative
     METERS_PER_DEG_LAT = 111_000
     METERS_PER_DEG_LON = 85_000  # à adapter selon latitude pour plus de précision
