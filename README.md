@@ -1,8 +1,5 @@
 # ETS_en_Turbulence
 
-> Suivi et prévision **temps réel** de la turbulence aérienne  
-> Projet de session – **MGA802** (Maîtrise en génie aérospatial, ÉTS Montréal)
-
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue?logo=python)](#prérequis)  
 [![Streamlit](https://img.shields.io/badge/streamlit-tableau-FF4B4B?logo=streamlit)](#🚀-démarrage-rapide)  
 [![Licence](https://img.shields.io/badge/licence-MIT-green.svg)](#licence)
@@ -11,18 +8,14 @@
 
 ## ✈️ Concept
 
-**ETS_en_Turbulence** :
+Ce projet, réalisé dans le cadre du cours MGA802 de l'École de Technologie Supérieure de Montréal, a pour objectif de détecter la position des turbulences mondiales en temps réel. 
 
-Ce projet, réalisé dans le cadre du cours MGA802 de l'École de Technologie Supérieure de Montréal, à pour objectif de détecter la position des turbulences mondiales en temps réel. 
-
-
+Le code :
 1. Interroge en continu l’API **OpenSky** pour récupérer les états ADS-B des avions mondiaux ;
 2. Détecte leurs potentielles instabilités, indiquant la présence d'une turbulence ;
 3. Récupère les vents locaux via **Open-Meteo** pour chaque position de turbulences ;
 4. Applique un algorithme de déplacement de turbulence en temps réel
 5. Diffuse les résultats dans un tableau de bord **Streamlit** (rafraîchi toutes les 3 s).
-
-<img src="docs/exemple_carte_streamlit.png" alt="Capture d’écran Streamlit" width="800">
 
 ---
 
@@ -61,10 +54,45 @@ Il est donc recommandé de se créer un compte pour une utilisation journalière
 ## Installation
 
 ```bash
-git clone https://github.com/<utilisateur>/ETS_en_Turbulence.git
+git clone https://github.com/2ar2t3/ETS_en_Turbulence.git
 cd ETS_en_Turbulence
 
 python -m venv .venv
 source .venv/bin/activate      # Windows : .venv\Scripts\activate
 
 pip install -r requirements.txt
+```
+## Exécution
+
+Ouvrez un terminal python.
+
+Placer l'environnement du terminal au même niveau que le fichier `main.py`, en utilisant la commande ``cd``
+
+Par exemple, si vous vous trouvez dans cet environnement initialement :
+
+```powershell
+PS C:\Users\hemer\Desktop\ETS\3 - E25\COURS\MGA802\Projet_final_G3>
+```
+
+Exécutez&nbsp;:
+
+```powershell
+cd Turbulence
+```
+
+Vous arriverez dans le dossier contenant `main.py`&nbsp;:
+
+```powershell
+PS C:\Users\hemer\Desktop\ETS\3 - E25\COURS\MGA802\Projet_final_G3\Turbulence>
+```
+
+Puis, entrer
+ ``streamlit run affichage_streamlit.py``
+
+Un fenêtre de votre navigateur s'ouvrira et l'affichage commencera d'ici 30secondes. 
+
+## Problèmes 
+
+Ce programme rencontre un important problème. 
+L'execution devient très longue (plus de 25s pour chaque requête) si le nombre de turbulences à afficher devient important, nous ne savons pourquoi.
+Initialement, on devait avoir une requête toutes les 6secondes mais ce n'est plus envisageable, ne pas s'inquiêter si rien ne se passe pendant plusieurs dizaines de secondes.
