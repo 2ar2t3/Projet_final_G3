@@ -9,3 +9,5 @@ Collaborateurs: Arthur Aussedat-Pretet, Victor Laloi, Vladislav Liksutin
 3. Instructions d’installation et d’utilisation (dépendances particulières)
 4. Utilisation d’un exemple fourni avec le code
 5. Autres informations pertinentes sur le code
+
+a finir
