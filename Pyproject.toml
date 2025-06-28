@@ -15,5 +15,5 @@ dependencies = [
 ]
 [project.urls]
 Homepage = "https://github.com/2ar2t3/Projet_final_G3"
-[tool.setuptools]
-py-modules = [""]
+[tool.setuptools.packages.find]
+where = ["."]
