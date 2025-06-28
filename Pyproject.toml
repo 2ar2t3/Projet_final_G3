@@ -2,7 +2,7 @@
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 [project]
-name = "ETS en Turbulence"
+name = "ets_en_turbulence"
 version = "1.0"
 description = "Détection et de prédiction de l’apparition et du déplacement des turbulences à l’échelle mondiale."
 readme = "README.md"
