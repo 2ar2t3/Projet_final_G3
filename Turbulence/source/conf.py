@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath("../"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'ETS_en_Turbulence'
+project = 'ETS en Turbulence'
 copyright = '2025, Arthur Aussedat-Pretet, Victor Laloi, Vladislav Liksutin'
 author = 'Arthur Aussedat-Pretet, Victor Laloi, Vladislav Liksutin'
 

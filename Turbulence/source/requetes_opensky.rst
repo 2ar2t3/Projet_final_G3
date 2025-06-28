@@ -1,7 +1,7 @@
-Requetes\_OpenSky module
+requetes\_opensky module
 ========================
 
-.. automodule:: Requetes_OpenSky
+.. automodule:: requetes_opensky
    :members:
    :show-inheritance:
    :undoc-members:

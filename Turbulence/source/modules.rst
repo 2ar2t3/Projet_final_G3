@@ -4,7 +4,7 @@ Tubulence
 .. toctree::
    :maxdepth: 4
 
-   Requetes_OpenSky
+   requetes_opensky
    affichage_streamlit
    affiche_carte
    main
