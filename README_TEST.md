@@ -18,7 +18,7 @@ Il vérifie que le code complet fonctionne correctement.
 ## Exécution
 
 Lancer le test depuis le terminal :
- cd Tubulence
+ cd Turbulence
 Et ensuite :
  streamlit run affichage_streamlit.py
 
