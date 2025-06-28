@@ -1,6 +1,17 @@
-import numpy as np
+"""
+Simulation de l'évolution des zones de turbulence en fonction des conditions météorologiques.
 
-# Rajouter dans le numpy array de turbulence la confiance a 100
+Ce module contient une fonction principale :
+- `deplacement_turbulence` : simule le déplacement, l'altération de taille, d'altitude et la perte de confiance
+  des zones de turbulence, sous l'effet du vent et du cisaillement vertical de l'air. Le déplacement est calculé
+  en tenant compte de la vitesse et direction du vent, et de l'évolution verticale induite par les gradients
+  de vent (cisaillements haut et bas).
+
+La sortie est un tableau numpy mis à jour représentant les nouvelles zones de turbulence significatives,
+filtrées selon leur niveau de confiance restant.
+"""
+
+import numpy as np
 
 def deplacement_turbulence(turbulence_data, meteo_data, delta_t=60):
     """

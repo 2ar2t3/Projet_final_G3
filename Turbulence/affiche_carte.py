@@ -1,8 +1,20 @@
+"""
+Visualisation interactive de zones de turbulence avec Streamlit et PyDeck.
+
+Ce script définit deux classes :
+- `Data` : structure et enrichit des données de turbulences (latitude, longitude, altitude, diamètre, confiance),
+           en les convertissant en un DataFrame prêt à être visualisé.
+- `Carte` : prend un ou plusieurs objets `Data` et génère une carte interactive avec PyDeck pour afficher
+            les zones de turbulence sous forme de cercles colorés selon le niveau de confiance.
+
+L’interface est conçue pour être utilisée dans une application Streamlit, permettant une exploration
+géographique intuitive des zones de turbulence.
+"""
+
 import streamlit as st
 import pandas as pd
-import numpy as np
 import pydeck as pdk
-from modele_deplacement_turbulence import *
+
 
 class Data:
     """
