@@ -19,9 +19,26 @@ class TurbulenceDetector:
 
     def update(self, states_df):
         """
-        Met à jour les données avec le nouveau DataFrame d'états 'states_df' (colonnes: name, latitude, longitude, altitude, vertical_rate).
-        Renvoie une liste d'événements de turbulence terminés (s'il y en a) sous forme de dictionnaires.
+        Met à jour les états des avions suivis et détecte les événements de turbulence.
+
+        Cette méthode prend en entrée un DataFrame contenant les données d'état actuelles des avions.
+        Elle met à jour l’historique de chaque avion et utilise une fenêtre glissante pour analyser
+        les variations du taux de montée/descente (``vertical_rate``). Si une instabilité est détectée
+        de manière prolongée, cela peut déclencher un événement de turbulence. Lorsqu’un avion redevient
+        stable, un événement de fin de turbulence est enregistré et retourné.
+
+        Les avions qui ne sont plus présents dans les données actuelles sont supprimés du suivi.
+
+        :param states_df: Un DataFrame contenant les données actuelles des avions.
+            Doit contenir les colonnes suivantes : ``latitude``, ``longitude``, ``altitude``, ``vertical_rate``.
+            Une colonne ``nom`` est également attendue pour l'identification des avions.
+        :type states_df: pandas.DataFrame
+
+        :return: Une liste d’événements de turbulence terminés. Chaque événement est représenté par un dictionnaire
+            contenant les coordonnées de début et de fin, ainsi que la distance horizontale entre les deux points.
+        :rtype: list of dict
         """
+
         # On transforme l'index numérique en nom pour regrouper les données par avion
         if 'nom' in states_df.columns:
             states_df = states_df.set_index('nom')
@@ -131,10 +148,26 @@ class TurbulenceDetector:
         return self.centre_turbulence(turbulences_terminees)
 
     def instabilite_detectee(self, vr_list):
+        """Détecte une instabilité verticale (turbulence) à partir d'une série de vitesses verticales.
 
-        """Détecte une instabilité verticale (turbulence) à partir d'une liste de 5
-        valeurs de vertical_rate (m/s).
-        Retourne True si une turbulence est détectée, False sinon."""
+        Cette méthode analyse une fenêtre de 5 valeurs successives de taux de montée/descente
+        (``vertical_rate`` en m/s) et évalue plusieurs critères d’instabilité basés sur
+        les variations de direction et d’amplitude. Elle retourne `True` si un comportement
+        turbulent est détecté, `False` sinon.
+
+        Critères :\n
+        - Saut instantané important (variation >= 10 m/s entre deux pas)\n
+        - Au moins deux inversions de direction avec un mouvement cumulé > 12 m\n
+        - Une seule inversion avec un mouvement cumulé > 15 m\n
+
+        :param vr_list: Liste de 5 valeurs successives de vertical_rate (m/s)
+        :type vr_list: list of float
+
+        :raises ValueError: Si la liste contient moins de 5 éléments
+
+        :return: `True` si une turbulence est détectée, sinon `False`
+        :rtype: bool
+        """
 
         # Vérifier que 5 valeurs sont fournies
         if vr_list is None or len(vr_list) < 5:
@@ -171,9 +204,20 @@ class TurbulenceDetector:
             return False
 
     def distance_horizontale_km(self, coord1, coord2):
-        """
-        Calcule la distance horizontale (en kilomètres) entre deux points géographiques (lat, lon, alt).
-        On ignore la différence d'altitude pour le calcul horizontal.
+        """Calcule la distance horizontale entre deux points géographiques.
+
+        Cette méthode utilise la formule de Haversine pour calculer la distance
+        horizontale (ignorant l'altitude) entre deux points donnés sous la
+        forme (latitude, longitude, altitude).
+
+        :param coord1: Coordonnées du premier point (lat, lon, alt)
+        :type coord1: tuple of float
+
+        :param coord2: Coordonnées du second point (lat, lon, alt)
+        :type coord2: tuple of float
+
+        :return: Distance horizontale en kilomètres
+        :rtype: float
         """
         lat1, lon1, _ = coord1
         lat2, lon2, _ = coord2
@@ -190,19 +234,21 @@ class TurbulenceDetector:
         return distance
 
     def centre_turbulence(self, turb):
-        """
-        Calcule le centre (lat, lon, alt) de chaque turbulence supposée sphérique
-        et renvoie un ndarray (N, 3).
+        """Calcule le centre estimé des turbulences détectées.
 
-        Paramètre
-        ---------
-        turb : list[dict]
-        liste de dicts au format actuellement renvoyé par update()
+        Chaque événement de turbulence est représenté par un dictionnaire contenant
+        un point de départ et un point de fin avec coordonnées (lat, lon, alt).
+        Le centre est défini comme la moyenne des coordonnées de début et de fin.
+        On ajoute également le diamètre horizontal (distance_km) et une confiance
+        (fixée ici à 100).
 
-        Retour
-        ------
-        ndarray (N, 3)
-            Colonnes : lat_c, lon_c, alt_c
+        :param turb: Liste d'événements de turbulence renvoyés par `update()`.
+            Chaque événement est un dictionnaire contenant les clés 'start', 'end' et 'distance_km'.
+        :type turb: list of dict
+
+        :return: Tableau numpy de forme (N, 5) contenant :
+            latitude, longitude, altitude du centre, diamètre, niveau de confiance
+        :rtype: numpy.ndarray
         """
         centres = []
         for evt in turb:  # evt est un dict 'start' / 'end'

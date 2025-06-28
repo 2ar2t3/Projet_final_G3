@@ -25,20 +25,22 @@ class OpenMeteo:
     @staticmethod
     def conversion_altitude_en_hpa(arr_ft):
         """
-        Copie le tableau `(lat, lon, altitude_ft)` et remplace la 3ᵉ colonne
-        par la pression standard (hPa) selon l’atmosphère ISA.
+        Convertit un tableau de coordonnées (latitude, longitude, altitude en pieds)
+        en un tableau identique dont l'altitude est remplacée par une estimation de la
+        pression atmosphérique standard (en hPa), selon l’atmosphère standard ISA.
 
-        Paramètres
-        ----------
-        arr_ft : ndarray (N, 3)
-            Colonne 0 : latitude
-            Colonne 1 : longitude
-            Colonne 2 : altitude en pieds
+        Cette méthode applique la formule barométrique standard pour convertir
+        une altitude géométrique en pression atmosphérique théorique :
 
-        Retour
-        ------
-        ndarray (N, 3)
-            Copie du tableau, mais la colonne 2 contient la pression en hPa.
+            P = P0 * (1 - (L * h / T0)) ^ (g*M / (R*L))
+
+        :param arr_ft: Un tableau numpy de forme (N, 3), où chaque ligne correspond à
+            un point géographique. La troisième colonne représente l'altitude en pieds.
+        :type arr_ft: numpy.ndarray
+
+        :return: Une copie du tableau d’entrée de forme (N, 3), où la troisième colonne
+            contient la pression atmosphérique estimée en hPa, calculée selon l’altitude.
+        :rtype: numpy.ndarray
         """
         out = arr_ft.copy()  # ne modifie pas l’original
         z_m = out[:, 2] # mètres
@@ -53,22 +55,26 @@ class OpenMeteo:
         return self.niveaux_possibles[np.abs(self.niveaux_possibles - hpa).argmin()]
 
     def donnees_vent(self, array_hpa):
-        """
-        Entrée
-        ------
-        turb_array : ndarray (N, 4)
-            Colonne 0 -> latitude
-            Colonne 1 -> longitude
-            Colonne 2 -> niveau-pression en hPa
-            Colonne 3 -> diametre de la turbulence
+        """Récupère les données de vent pour un tableau de turbulences actives,
+        basé sur leur position géographique et leur niveau de pression en hPa.
 
-        Sortie
-        ------
-        ndarray (N, 4)
-            Colonne 0 -> vitesse du vent (m/s)
-            Colonne 1 -> direction du vent (°)
-            Colonne 2 -> cisaillement au dessus
-            Colonne 3 -> cisaillement en dessous
+        Pour chaque point, cette méthode interroge l’API météo afin de récupérer :
+        - la vitesse du vent (m/s)
+        - la direction du vent (°)
+        - le cisaillement vertical au-dessus et en dessous du point
+
+        :param array_hpa: Tableau des turbulences actives de forme (N, 5).
+            Chaque ligne représente une turbulence sous la forme :
+            [latitude, longitude, pression_hPa, diamètre, confiance].
+            Seules les 3 premières colonnes sont utilisées ici.
+        :type array_hpa: numpy.ndarray
+
+        :return: Tableau de forme (N, 4) contenant pour chaque turbulence :
+            - vitesse du vent (m/s)
+            - direction du vent (degrés)
+            - cisaillement vertical au-dessus (m/s)
+            - cisaillement vertical en dessous (m/s)
+        :rtype: numpy.ndarray
         """
         # Création d'un array pour stocker les résultats
         n = len(array_hpa)
@@ -77,7 +83,7 @@ class OpenMeteo:
         # Itèration sur chaque turbulence active
         for turb, (lat, lon, niv, _, _) in enumerate(array_hpa):
 
-            # Normalisation du niveau souhaité au plus proche disponible
+            # Normalisation du niveau souhaité au plus proche disponible`
             niveau = int(self.niveau_proche(niv))
 
             # Récupération des niveaux supérieurs et inférieurs
