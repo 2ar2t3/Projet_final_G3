@@ -91,32 +91,3 @@ class Carte:
         )
 
         st.pydeck_chart(deck)
-
-
-# Jeu de données initial : [lat, lon, alt, diam, confiance]
-turb_array = np.array([[45.0, -73.0, 10000, 5000, 100]])
-meteo_array = np.array([[20, 90, 0.2, -0.1]])
-
-nb_iterations = 10
-data_list = [Data(turb_array, label="originale")]
-
-current = turb_array.copy()
-
-for i in range(nb_iterations):
-    # déplace et décrémente confiance (10 points par itération)
-    current = deplacement_turbulence(current, meteo_array)
-
-    # filtre les turbulences dont la confiance est > 0
-    current = current[current[:, 4] > 0]
-
-    # si tout est effacé, on s'arrête
-    if current.size == 0:
-        break
-
-    # on ajoute pour affichage
-    confiance = int(current[0, 4])
-    data_list.append(Data(current.copy(), label=f"predite {i + 1}"))
-
-# Affichage final
-carte = Carte(*data_list)
-carte.affichage()
