@@ -52,6 +52,7 @@ Il est donc recommandé de se créer un compte pour une utilisation journalière
 ---
 
 ## Installation
+package ici: https://test.pypi.org/project/ets-en-turbulence/1.0/
 
 ```bash
 git clone https://github.com/2ar2t3/ETS_en_Turbulence.git
