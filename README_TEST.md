@@ -17,10 +17,31 @@ Il vérifie que le code complet fonctionne correctement.
 
 ## Exécution
 
-Lancer le test depuis le terminal :
- cd Turbulence
-Et ensuite :
- streamlit run affichage_streamlit.py
+Lancer le test depuis le terminal python.
+
+Placer l'environnement du terminal au même niveau que le fichier `main.py`, en utilisant la commande ``cd``
+
+Exemple :
+
+```powershell
+PS C:\Users\hemer\Desktop\ETS\3 - E25\COURS\MGA802\Projet_final_G3>
+```
+
+puis exécutez&nbsp;:
+
+```powershell
+cd Turbulence
+```
+
+vous arriverez dans le dossier contenant `main.py`&nbsp;:
+
+```powershell
+PS C:\Users\hemer\Desktop\ETS\3 - E25\COURS\MGA802\Projet_final_G3\Turbulence>
+```
+
+Puis, entrer
+ ``streamlit run affichage_streamlit.py``
+ 
 
  ## Résultat
 
