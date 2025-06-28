@@ -1,0 +1,12 @@
+numpy
+threading
+time
+numpy
+requests
+pandas
+collections
+math
+streamlit
+pydeck
+streamlit_autorefresh
+matplotlib.pyplot

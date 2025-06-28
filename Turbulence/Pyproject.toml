@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "ETS en Turbulence"
+version = "1.0"
+description = "Détection et de prédiction de l’apparition et du déplacement des turbulences à l’échelle mondiale."
+readme = "README.md"
+authors = []
+keywords = []
+license = {text = "MIT"}
+dependencies = [
+"numpy", "threading", "time", "numpy", "requests", "pandas", "collections", "math",
+    "streamlit", "pydeck", "streamlit_autorefresh", "matplotlib.pyplot",
+]
+[project.urls]
+Homepage = "https://github.com/2ar2t3/Projet_final_G3"
+[tool.setuptools]
+py-modules = [""]
